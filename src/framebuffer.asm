@@ -104,7 +104,7 @@ get_pixel_addr::
 
     ; move hl to the local pixel row of the tile
     ld      a, [tile_pixel_offset_y]
-    sla     a
+    sla     a           ; a = a * 2
     ld      d, 0
     ld      e, a
     add     hl, de      ; hl = hl + offset_y * 2
@@ -117,13 +117,15 @@ get_pixel_addr::
     sub     e
     ld      c, a
     inc     c
+
+    ; set d and e with the intial states for mask0 and mask1
     ld      a, [color_value]
     and     a, %00000001
     ld      d, a
     ld      a, [color_value]
     and     a, %00000010
     ld      e, a
-    sla     e
+    sra     e
     jp      .skip
 .loop
     sla     d

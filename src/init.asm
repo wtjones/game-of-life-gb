@@ -21,36 +21,63 @@ init::
     call    mem_Set
 
     call init_framebuffer
+    xor     a
+    ld      [command_list_length], a
 
     ; test calls
-    ld      d, 110
-    ld      e, 69
-    ld      h, %00000010
-    call get_pixel_addr
-    call set_pixel
-
     ld      d, 0
     ld      e, 0
-    ld      h, %00000001
+    ld      h, %00000010    
     call get_pixel_addr
-    call set_pixel
+    ld      b, d
+    ld      c, e
+    push    hl
+    pop     de
+    call push_command_list
+   
 
-    ld      d, 4
-    ld      e, 4
-    ld      h, %00000001
+    ld      d, 127
+    ld      e, 0
+    ld      h, %00000010
     call get_pixel_addr
-    call set_pixel
+    ld      b, d
+    ld      c, e
+    push    hl
+    pop     de
+    call push_command_list
+   
 
     ld      d, 0
     ld      e, 127
-    ld      h, %00000001
+    ld      h, %00000010
     call get_pixel_addr
-    call set_pixel
+    ld      b, d
+    ld      c, e
+    push    hl
+    pop     de
+    call push_command_list
+   
 
-    ld      d, 4
-    ld      e, 123
-    ld      h, %00000001
+    ld      d, 127
+    ld      e, 127
+    ld      h, %00000010
     call get_pixel_addr
-    call set_pixel
+    ld      b, d
+    ld      c, e
+    push    hl
+    pop     de
+    call push_command_list
+   
+    ld      d, 121
+    ld      e, 121
+    ld      h, %00000010
+    call get_pixel_addr
+    ld      b, d
+    ld      c, e
+    push    hl
+    pop     de
+    call push_command_list
+   
+    call apply_command_list
 
 ret
