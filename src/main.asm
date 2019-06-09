@@ -28,14 +28,20 @@ start::
     ld      a, LCDCF_ON | LCDCF_BG8000 | LCDCF_OBJON | LCDCF_BGON
     ldh     [rLCDC], a
 
+    ; TODO: make conditional
+    jp      test_mode
 
-.loop:
+.main_loop:
+    xor     a
+    ld      [command_list_length], a
+
+    ; TODO
     call    wait_vblank
-
+    call    apply_command_list
     ASSERT_NOT_BUSY     ; If the vblank period ended while applying the command
                         ; list, undefined behavior may have occurred.
                         ; The assert will halt the program for debug purposes.
-    jr      .loop
+    jr      .main_loop
 
 draw:
 stat:

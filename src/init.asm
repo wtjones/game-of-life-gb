@@ -19,65 +19,8 @@ init::
     ld      bc, _SCRN1 - _SCRN0
     ld      a, $ff
     call    mem_Set
-
-    call init_framebuffer
-    xor     a
-    ld      [command_list_length], a
-
-    ; test calls
-    ld      d, 0
-    ld      e, 0
-    ld      h, %00000010    
-    call get_pixel_addr
-    ld      b, d
-    ld      c, e
-    push    hl
-    pop     de
-    call push_command_list
-   
-
-    ld      d, 127
-    ld      e, 0
-    ld      h, %00000010
-    call get_pixel_addr
-    ld      b, d
-    ld      c, e
-    push    hl
-    pop     de
-    call push_command_list
-   
-
-    ld      d, 0
-    ld      e, 127
-    ld      h, %00000010
-    call get_pixel_addr
-    ld      b, d
-    ld      c, e
-    push    hl
-    pop     de
-    call push_command_list
-   
-
-    ld      d, 127
-    ld      e, 127
-    ld      h, %00000010
-    call get_pixel_addr
-    ld      b, d
-    ld      c, e
-    push    hl
-    pop     de
-    call push_command_list
-   
-    ld      d, 121
-    ld      e, 121
-    ld      h, %00000010
-    call get_pixel_addr
-    ld      b, d
-    ld      c, e
-    push    hl
-    pop     de
-    call push_command_list
-   
-    call apply_command_list
+    call    init_random
+    call    init_palette
+    call    init_framebuffer
 
 ret

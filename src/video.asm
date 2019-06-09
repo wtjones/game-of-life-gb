@@ -27,10 +27,10 @@ wait_vblank::
 
 ; Sets the colors to normal palette
 init_palette::
-    ld     a, %00011011     ; grey 3=00 (Transparent)
-                            ; grey 2=01 (Ligth grey)
-                            ; grey 1=10 (Dark grey)
-                            ; grey 0=11 (Black)
+    ld     a, %11100100     ; grey 3=11 (Black)
+                            ; grey 2=10 (Dark grey)
+                            ; grey 1=01 (Light grey)
+                            ; grey 0=00 (Transparent)
     ld    [rBGP], a
     ld    [rOBP0], a         ; 48,49 are sprite palettes
                 ; set same as background

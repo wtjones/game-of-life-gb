@@ -36,8 +36,9 @@ set_pixel::
 ;   h = color value
 ; Outputs:
 ;   hl = address of pixel in tilemap
-;   d = mask0
-;   e = mask1
+;   b = mask
+;   d = value0
+;   e = value1
 ; Destroys:
 ;   bc
 get_pixel_addr::
@@ -64,7 +65,6 @@ get_pixel_addr::
     ld      a, e    ; a = y pixel param
     sub     a, c    ; a = y pixel - tile aligned y pixel
     ld      [tile_pixel_offset_y], a
-
 
     ; tile_x = pixel_x / 8
     ld      a, d            ; a = x pixel param
@@ -119,6 +119,7 @@ get_pixel_addr::
     inc     c
 
     ; set d and e with the intial states for mask0 and mask1
+    ld      b, %00000001
     ld      a, [color_value]
     and     a, %00000001
     ld      d, a
@@ -128,12 +129,17 @@ get_pixel_addr::
     sra     e
     jp      .skip
 .loop
+    sla     b
     sla     d
     sla     e
 .skip
     dec     c
     jp      nz, .loop
 
+    ; invert mask
+    ld      a, b
+    cpl
+    ld      b, a
     ret
 
 

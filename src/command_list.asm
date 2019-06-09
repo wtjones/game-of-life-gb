@@ -2,53 +2,79 @@ INCLUDE	"gbhw.inc"
 INCLUDE "memory.inc"
 
 COMMAND_LIST_MAX       EQU 50
-COMMAND_LIST_SIZE      EQU 4
+COMMAND_LIST_SIZE      EQU 8
 
 SECTION "command list vars", WRAM0
 
 command_list_length:: DS 1     ; offset of the next available record
 command_list:: DS COMMAND_LIST_MAX * COMMAND_LIST_SIZE
-
+dest_hight:: DS 1
+dest_low:: DS 1
+push_mask:: DS 1
+push_value0:: DS 1
+push_value1:: DS 1
 SECTION "command list utility", ROM0
 
 
 ; Push an operation into the command list
 ;
 ;Inputs:
-; de = destination
-; b = mask0
-; c = mask1
+; hl = destination
+; b = mask
+; d = value0
+; e = value1
 ;Destroys:
 ; BC, HL
 push_command_list::
-    ; determine offset via length * 4
+    ld      a, b
+    ld      [push_mask], a
+    ld      a, d
+    ld      [push_value0], a
+    ld      a, e
+    ld      [push_value1], a
+
+    push    hl
+    pop     de      ; move destination to de
+    ; determine offset via length * 8
     ld      a, [command_list_length]
 
     rlca
     rlca
+    rlca
 
-    push    bc
     ld      b, 0
     ld      c, a
 
     ld      hl, command_list
     add     hl, bc
-    pop     bc
 
     ; structure:
     ; - dest high
     ; - dest low
-    ; - mask0
-    ; - mask1
+    ; - mask
+    ; - value0
+    ; - value1
+    ; - padding
+    ; - padding
+    ; - padding
 
     ld      a, d
     ld      [hl+], a
     ld      a, e
     ld      [hl+], a
-    ld      a, b
+
+    ld      a, [push_mask]
     ld      [hl+], a
-    ld      a, c
-    ld      [hl], a
+    ld      a, [push_value0]
+    ld      [hl+], a
+    ld      a, [push_value1]
+    ld      [hl+], a
+
+    ; zero-out padding bytes
+    xor     a
+    ld      [hl+], a
+    ld      [hl+], a
+    ld      [hl+], a
 
     ld      a, [command_list_length]
     inc     a
@@ -65,24 +91,49 @@ apply_command_list::
 
     inc	    c
     jr      .skip
-.loop    
+.loop
+    push    bc
+
     ld      a, [hl+]
-    ld      d, a        ; dest high byte
+    ld      d, a                ; dest high byte
     ld      a, [hl+]
-    ld      e, a        ; dest low byte
-    
-    ld      a, [hl+]    ; mask0
-    ld      b, a
-    ld      a, [de]     ; get the current value
-    or      a, b        ; apply mask
-    ld      [de], a
-    
-    ld      a, [hl+]    ; mask1
-    ld      b, a
-    ld      a, [de]     ; get the current value
-    or      a, b        ; apply mask
-    ld      [de], a
-        
+    ld      e, a                ; dest low byte
+
+    ld      a, [hl+]            ; mask
+    ld      [push_mask], a
+    ld      b, a                ; mask is in b
+
+    ld      a, [hl+]            ; value0
+    ld      [push_value0], a
+    ld      a, [hl+]            ; value1
+    ld      [push_value1], a
+    inc     hl
+    inc     hl
+    inc     hl
+
+    ; use hl to apply operations to the destination
+    push    hl
+    push    de
+    pop     hl
+
+    ld      a, b
+    and     a, [hl]             ; apply mask to clear target bit
+    ld      [hl], a             ; save result
+    ld      a, [push_value0]
+    or      a, [hl]             ; set color
+    ld      [hl], a             ; save result
+    inc     hl
+
+    ld      a, b
+    and     a, [hl]             ; apply mask to clear target bit
+    ld      [hl], a             ; save result
+    ld      a, [push_value1]
+    or      a, [hl]             ; set color and move to 2nd byte
+    ld      [hl], a             ; save result
+
+    pop     hl
+    pop     bc
+
 .skip
     dec	    c
     jr      nz,.loop
