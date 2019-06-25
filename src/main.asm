@@ -21,15 +21,15 @@ start::
     ldh     [rSCX], a
 
     ldh     [rLCDC], a	; init LCD to everything off
-
-    call    init
     ei
+    call    init
+
     ; enable LCD, sprites, bg
     ld      a, LCDCF_ON | LCDCF_BG8000 | LCDCF_OBJON | LCDCF_BGON
     ldh     [rLCDC], a
 
     ; TODO: make conditional
-    jp      test_mode
+    call    test_mode
 
 .main_loop:
     xor     a

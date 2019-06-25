@@ -1,8 +1,8 @@
 INCLUDE "debug.inc"
 
-PIXELS_PER_FRAME        EQU 1
-FRAMEBUFFER_WIDTH       EQU 16
-FRAMEBUFFER_HEIGHT      EQU 8
+PIXELS_PER_FRAME        EQU 12
+FRAMEBUFFER_WIDTH       EQU 128
+FRAMEBUFFER_HEIGHT      EQU 128
 
 SECTION "test mode vars", WRAM0
 
@@ -15,8 +15,8 @@ SECTION "test mode utility", ROM0
 test_mode::
     ; TODO make conditional
     ;jp random_fill
-    jp flood_fill
-    ;jp static_pixels
+    call flood_fill
+    ;call static_pixels
     ret
 
 

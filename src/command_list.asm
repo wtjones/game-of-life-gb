@@ -16,6 +16,13 @@ push_value1:: DS 1
 SECTION "command list utility", ROM0
 
 
+init_command_list::
+    ld      hl, command_list
+    ld      bc, COMMAND_LIST_MAX * COMMAND_LIST_SIZE
+    ld      a, $0
+    call    mem_Set
+    ret
+
 ; Push an operation into the command list
 ;
 ;Inputs:
