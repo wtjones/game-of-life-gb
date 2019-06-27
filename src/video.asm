@@ -36,23 +36,3 @@ init_palette::
                 ; set same as background
     ld    [rOBP1], a
     ret
-
-
-; Calculate an address offset of hl
-; Outputs:
-; hl = hl + (c * de)
-; hl = address in VRAM of start of row
-calc_addr::
-
-    ld      c, a
-    inc     c
-    ;ld      hl, _VRAM
-    ;ld      de, $100
-    jp      .skip
-
-.loop
-    add     hl, de
-.skip
-    dec     c
-    jp      nz, .loop
-    ret

@@ -1,6 +1,6 @@
 INCLUDE	"gbhw.inc"
 INCLUDE "memory.inc"
-
+INCLUDE "framebuffer.inc"
 
 SECTION "framebuffer vars", WRAM0
 
@@ -91,7 +91,8 @@ get_pixel_addr::
     ld      de, 256
     ld      a, [tile_y]
     ld      c, a
-    call    calc_addr  ; hl now points to _VRAM + (y * 256)
+    CALC_ADDR   ; hl = _VRAM + (y * 256)
+                ; hl now points to start of row
 
 
     ; tile_ptr =  (tile_y << 8) + (tile_x << 3)
@@ -99,8 +100,8 @@ get_pixel_addr::
     ld      de, 16
     ld      a, [tile_x]
     ld      c, a
-    call    calc_addr   ; hl now points to target tile:
-                        ; hl = start_of_row + (x * 16)
+    CALC_ADDR   ; hl = hl + (x * 16)
+                ; hl now points to target tile:
 
     ; move hl to the local pixel row of the tile
     ld      a, [tile_pixel_offset_y]
