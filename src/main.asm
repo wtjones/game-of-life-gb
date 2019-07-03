@@ -28,7 +28,11 @@ start::
     ld      a, LCDCF_ON | LCDCF_BG8000 | LCDCF_OBJON | LCDCF_BGON
     ldh     [rLCDC], a
 
-    ; TODO: make conditional
+    ; read mode from make param
+    ld      hl, initial_mode
+    ld      a, [hl]
+    cp      0
+    jr      z, .main_loop
     call    test_mode
 
 .main_loop:
@@ -49,3 +53,6 @@ timer:
 serial:
 joypad:
     reti
+
+initial_mode:
+    DB mode

@@ -12,11 +12,19 @@ fill_color:: DS 1
 
 SECTION "test mode utility", ROM0
 
+; Test mode entry
+; Inputs:
+;   a = mode in 1, 2, 3
 test_mode::
-    ; TODO make conditional
-    ;jp random_fill
-    call flood_fill
-    ;call static_pixels
+    cp      1
+    jr      nz, .skip1
+    call    flood_fill
+.skip1
+    cp      2
+    jr      nz, .skip2
+    call static_pixels
+.skip2
+    call random_fill
     ret
 
 
