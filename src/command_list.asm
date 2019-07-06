@@ -1,8 +1,9 @@
 INCLUDE	"gbhw.inc"
 INCLUDE "memory.inc"
 
-COMMAND_LIST_MAX       EQU 50
-COMMAND_LIST_SIZE      EQU 8
+COMMAND_LIST_MAX        EQU 50
+COMMAND_LIST_SIZE       EQU 8
+COMMANDS_PER_FRAME_MAX  EQU 12
 
 SECTION "command list vars", WRAM0
 
@@ -13,6 +14,7 @@ dest_low:: DS 1
 push_mask:: DS 1
 push_value0:: DS 1
 push_value1:: DS 1
+
 SECTION "command list utility", ROM0
 
 
@@ -91,14 +93,25 @@ push_command_list::
 
 
 apply_command_list::
-
     ld      hl, command_list
     ld      a, [command_list_length]
     ld      c, a
+    ld      b, COMMANDS_PER_FRAME_MAX
 
+    inc     b
     inc	    c
     jr      .skip
 .loop
+    ; If COMMANDS_PER_FRAME_MAX have already been written, wait until the next
+    ; vblank before continuing.
+    dec     b
+    jr      nz, .skip_vblank
+    ld      b, COMMANDS_PER_FRAME_MAX
+    push    hl
+    call    wait_vblank
+    pop     hl
+
+.skip_vblank
     push    bc
 
     ld      a, [hl+]
