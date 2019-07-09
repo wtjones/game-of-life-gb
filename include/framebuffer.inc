@@ -1,6 +1,8 @@
 IF      !DEF(FRAMEBUFFER_ASM)
 FRAMEBUFFER_ASM     SET  1
 
+FRAMEBUFFER_WIDTH       EQU 64
+FRAMEBUFFER_HEIGHT      EQU 64
 
 ; Calculate an address offset of hl
 ; Inputs

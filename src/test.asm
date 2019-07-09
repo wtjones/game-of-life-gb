@@ -1,8 +1,7 @@
 INCLUDE "debug.inc"
+INCLUDE "framebuffer.inc"
 
 PIXELS_PER_FRAME        EQU 12
-FRAMEBUFFER_WIDTH       EQU 128
-FRAMEBUFFER_HEIGHT      EQU 128
 
 SECTION "test mode vars", WRAM0
 

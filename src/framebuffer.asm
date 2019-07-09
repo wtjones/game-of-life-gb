@@ -29,7 +29,7 @@ set_pixel::
     ret
 
 
-; Resolution of 128 * 128
+; Resolution of FRAMEBUFFER_WIDTH * FRAMEBUFFER_HEIGHT
 ; Inputs:
 ;   d = x value
 ;   e = y coord
@@ -88,10 +88,10 @@ get_pixel_addr::
     ; advance address to the target tile
 
     ld      hl, _VRAM
-    ld      de, 256
+    ld      de, FRAMEBUFFER_WIDTH * 2 ; 2 bytes per pixel
     ld      a, [tile_y]
     ld      c, a
-    CALC_ADDR   ; hl = _VRAM + (y * 256)
+    CALC_ADDR   ; hl = _VRAM + (y * FRAMEBUFFER_WIDTH * 2)
                 ; hl now points to start of row
 
 
@@ -150,14 +150,20 @@ get_pixel_addr::
 ;   everything
 init_framebuffer::
     ld      hl, _SCRN0
-    ld      bc, 16
+    ; skip to center the vertical
+    ld      de, (SCRN_Y - FRAMEBUFFER_HEIGHT) * 2
+    add     hl, de
+
+    ld      bc, FRAMEBUFFER_HEIGHT / 8
     ld      d, 0      ; tile counter
 init_framebuffer_outer_loop
-    inc     hl
-    inc     hl
+    push    de
+    ld      de, (SCRN_X - FRAMEBUFFER_WIDTH) / 16
+    add     hl, de
+    pop     de
     push bc
 
-    ld      bc, 16
+    ld      bc, FRAMEBUFFER_WIDTH / 8
 init_framebuffer_inner_loop
     ld      a, d
     ld      [hl], a
@@ -169,9 +175,9 @@ init_framebuffer_inner_loop
     or      c
     jr      nz, init_framebuffer_inner_loop
 
-    ; advance hl to next row
+    ; advance hl to next row, accounting for virtual size
     push    de
-    ld      de, 14
+    ld      de, ((SCRN_X - FRAMEBUFFER_WIDTH) / 16) + 12
     add     hl, de
     pop     de
 
