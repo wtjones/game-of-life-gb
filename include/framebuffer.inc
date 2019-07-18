@@ -1,6 +1,12 @@
 IF      !DEF(FRAMEBUFFER_ASM)
 FRAMEBUFFER_ASM     SET  1
 
+INCLUDE        "gbhw.inc"
+
+FRAMEBUFFER_MAX         EQU 250 * 64    ; Must use fewer than 255 tile indexes
+                                        ; to account for the border, so
+                                        ; 160 * 100 / 64 = 250 is max usable
+                                        ; tiles possible.
 FRAMEBUFFER_WIDTH       EQU 64
 FRAMEBUFFER_HEIGHT      EQU 64
 
