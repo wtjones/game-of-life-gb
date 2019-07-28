@@ -23,8 +23,11 @@ init::
     call    init_random
     call    init_palette
     call    init_framebuffer
+    call    init_cell_buffer
 
     call    init_command_list
     xor     a
     ld      [frame_count], a
+
+    call    init_game
 ret

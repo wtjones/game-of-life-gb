@@ -39,6 +39,7 @@ start::
     xor     a
     ld      [command_list_length], a
 
+    call    iterate_game
     ; TODO
     call    wait_vblank
     call    apply_command_list
