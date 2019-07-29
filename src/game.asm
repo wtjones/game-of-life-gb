@@ -13,6 +13,7 @@ SECTION "game code", ROM0
 
 
 init_game::
+
     ; call get_current_cell_buffer;   buffer in hl
 
     ; ; set a few initial cells
@@ -23,6 +24,7 @@ init_game::
     ; ld      [hl], %00111001
     ; add     hl, de
     ; ld      [hl], %00111001
+    ;call    get_cell_buffers     ; buffers in hl, de
     ret
 
 

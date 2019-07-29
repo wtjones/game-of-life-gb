@@ -44,7 +44,21 @@ init_cell_buffer::
     ret
 
 swap_cell_buffers::
-    ; TODO
+    call    get_cell_buffers
+    push    hl
+    ld      hl, current_cell_buffer
+    ld      a, d
+    ld      [hl+], a
+    ld      a, e
+    ld      [hl], a
+
+    pop     de
+    ld      hl, successor_cell_buffer
+    ld      a, d
+    ld      [hl+], a
+    ld      a, e
+    ld      [hl], a
+
     ret
 
 

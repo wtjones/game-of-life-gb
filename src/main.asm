@@ -40,6 +40,7 @@ start::
     ld      [command_list_length], a
 
     call    iterate_game
+    call    swap_cell_buffers
     ; TODO
     call    wait_vblank
     call    apply_command_list
