@@ -23,6 +23,8 @@ init_command_list::
     ld      bc, COMMAND_LIST_MAX * COMMAND_LIST_SIZE
     ld      a, $0
     call    mem_Set
+    xor     a
+    ld      [command_list_length], a
     ret
 
 ; Push an operation into the command list

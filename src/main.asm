@@ -39,11 +39,17 @@ start::
     xor     a
     ld      [command_list_length], a
 
+    ld      a, [game_iterations]
+    cp      a, 0
+    jr      nz, .iterated
     call    iterate_game
-    call    swap_cell_buffers
+.iterated
+    ;call    swap_cell_buffers
     ; TODO
     call    wait_vblank
     call    apply_command_list
+    xor     a
+    ld      [command_list_length], a
     ASSERT_NOT_BUSY     ; If the vblank period ended while applying the command
                         ; list, undefined behavior may have occurred.
                         ; The assert will halt the program for debug purposes.

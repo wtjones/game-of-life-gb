@@ -1,3 +1,4 @@
+INCLUDE "debug.inc"
 INCLUDE "framebuffer.inc"
 
 CELL_BUFFER_WIDTH   EQU FRAMEBUFFER_WIDTH
@@ -10,6 +11,8 @@ SECTION "cell buffer vars", WRAM0
 
 cell_buffer_0: DS CELL_BUFFER_BYTES
 cell_buffer_1: DS CELL_BUFFER_BYTES
+neighbor_count_buffer: DS CELL_BUFFER_WIDTH
+;neighbor_
 current_cell_buffer: DS 2
 successor_cell_buffer: DS 2
 current_cell_buffer_low: DS 1
@@ -128,7 +131,7 @@ get_cell_buffers::
     ld      a, [current_cell_buffer_high]
     ld      h, a
     ld      a, [current_cell_buffer_low]
-    ld      h, a
+    ld      l, a
     ld      a, [successor_cell_buffer_high]
     ld      d, a
     ld      a, [successor_cell_buffer_low]
@@ -172,6 +175,10 @@ get_neighbors::
     ld      a, [cell_neighbor_count]
     ld      d, a
     ret
+
+
+
+
 
 ; Inputs
 ;   hl = current buffer
@@ -273,4 +280,57 @@ set_cell::
 
     ;
 
+    ret
+
+init_neighbor_count_buffer::
+    ld      hl, neighbor_count_buffer
+    ld      bc, CELL_BUFFER_HEIGHT
+    ld      a, $00
+    call    mem_Set
+    ret
+
+; Inputs
+;   hl = start of source cell buffer row
+; Destroys
+;   de, bc
+add_cells::
+    ld      de, neighbor_count_buffer
+    ld      a, %10000000
+    ld      [cell_mask], a
+    ld      c, CELL_BUFFER_WIDTH
+    inc     c
+    jp      .skip
+.loop
+    ; read the cell state
+    ld      a, [cell_mask]
+    and     a, [hl]
+    ; is result zero?
+    jp      nz, .cell_is_set
+    ld      b, 0
+.cell_is_set
+    ld      b, 1
+    ; b now has the cell state
+
+
+    ; perform an add of the cell value to the current buffer record
+    ld      a, [de]
+    add     a, b
+    ld      [de], a
+
+    ; rotate the mask
+    ld      a, [cell_mask]
+    rrca
+    ld      [cell_mask], a
+    ; did it wrap?
+    cp      a, 1
+    ;DBGMSG "mask wrapped"
+    jp      nz, .did_not_wrap
+    inc     hl ; move to next byte of cell buffer
+.did_not_wrap
+
+
+    inc     de  ; move to next byte in count buffer
+.skip
+    dec     c
+    jp      nz, .loop
     ret
