@@ -1,7 +1,8 @@
 INCLUDE	"gbhw.inc"
 INCLUDE "memory.inc"
+INCLUDE "debug.inc"
 
-COMMAND_LIST_MAX        EQU 50
+COMMAND_LIST_MAX        EQU 60
 COMMAND_LIST_SIZE       EQU 8
 COMMANDS_PER_FRAME_MAX  EQU 12
 
@@ -49,6 +50,14 @@ push_command_list::
     ; determine offset via length * 8
     ld      a, [command_list_length]
 
+    ; assert that we have room in the command list
+    sub     a, COMMAND_LIST_MAX
+    jr      c, .list_limit_ok
+    DBGMSG  "COMMAND_LIST_MAX exceeded"
+    di
+    halt
+.list_limit_ok
+    ld      a, [command_list_length]
     rlca
     rlca
     rlca

@@ -21,13 +21,33 @@ init_game::
     pop     hl
     pop     de
     ; set a few initial cells
-    ld      [hl], %10101010
+    ld      [hl], %10000001
     inc     hl
-    ld      [hl], %10101010
+    ld      [hl], %01000010
     inc     hl
-    ld      [hl], %01010101
+
+    ld      [hl], %10000001
     inc     hl
-    ld      [hl], %01010101
+    ld      [hl], %01000010
+    inc     hl
+
+    inc     hl
+    inc     hl
+    inc     hl
+    inc     hl
+    inc     hl
+    inc     hl
+    inc     hl
+    inc     hl
+    inc     hl
+    inc     hl
+    inc     hl
+    inc     hl
+    inc     hl
+    inc     hl
+    ld      [hl], %10000001
+    inc     hl
+    ld      [hl], %01000010
 
     ; ld      d, 0
     ; ld      e, 12
@@ -62,16 +82,16 @@ iterate_game::
     DBGMSG "row loop"
 
 
-    push    bc
-    push    hl
-    ld      d, b
-    ld      e, c
-    ld      h, 1
+    ; push    bc
+    ; push    hl
+    ; ld      d, 0
+    ; ld      e, c
+    ; ld      h, 1
 
-    call    get_pixel_addr
-    call    push_command_list
-    pop     hl
-    pop     bc
+    ; call    get_pixel_addr
+    ; call    push_command_list
+    ; pop     hl
+    ; pop     bc
 
     ; update count buffer
     ;call    add_cells
@@ -85,12 +105,28 @@ iterate_game::
     ld      a, [cell_mask]
     and     a, [hl]
     ; is result zero?
-    jp      nz, .cell_is_set
+    jp      z, .cell_not_set
+    DBGMSG "cell set"
+
+
+    push    bc
+    push    hl
+    ld      d, 6
+    ld      e, c
+    ld      h, 1
+
+    call    get_pixel_addr
+    call    push_command_list
+    pop     hl
+    pop     bc
+
+    ld      a, 1
+    jp      .continue
+.cell_not_set
     DBGMSG "cell not set"
     ld      a, 0
-.cell_is_set
-    DBGMSG "cell set"
-    ld      a, 1
+
+.continue
 
 
     ; push hl
