@@ -96,11 +96,11 @@ flood_fill:
     ld      a, d
     ld      [fill_pixel_x], a
 
-    call    wait_vblank
-    call    apply_command_list
-    ASSERT_NOT_BUSY     ; If the vblank period ended while applying the command
-                        ; list, undefined behavior may have occurred.
-                        ; The assert will halt the program for debug purposes.
+    ; call    wait_vblank
+    ; call    apply_command_list
+    ; ASSERT_NOT_BUSY     ; If the vblank period ended while applying the command
+    ;                     ; list, undefined behavior may have occurred.
+    ;                     ; The assert will halt the program for debug purposes.
     jp      .flood_loop
 
 

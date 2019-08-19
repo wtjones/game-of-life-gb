@@ -39,12 +39,9 @@ start::
     xor     a
     ld      [command_list_length], a
 
-    ; TODO
-    call    wait_vblank
-    call    apply_command_list
-    ASSERT_NOT_BUSY     ; If the vblank period ended while applying the command
-                        ; list, undefined behavior may have occurred.
-                        ; The assert will halt the program for debug purposes.
+    ; TODO: Although vblank + draw is handled while pushing commands,
+    ;       it might be good to force a draw after an iteration if commands
+    ;       exist.
     jr      .main_loop
 
 draw:

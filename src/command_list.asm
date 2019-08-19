@@ -1,9 +1,10 @@
 INCLUDE	"gbhw.inc"
 INCLUDE "memory.inc"
+INCLUDE "debug.inc"
 
-COMMAND_LIST_MAX        EQU 50
-COMMAND_LIST_SIZE       EQU 8
 COMMANDS_PER_FRAME_MAX  EQU 12
+COMMAND_LIST_MAX        EQU COMMANDS_PER_FRAME_MAX
+COMMAND_LIST_SIZE       EQU 8
 
 SECTION "command list vars", WRAM0
 
@@ -26,6 +27,7 @@ init_command_list::
     ret
 
 ; Push an operation into the command list
+; If the buffer is full, a draw is forced.
 ;
 ;Inputs:
 ; hl = destination
@@ -89,6 +91,16 @@ push_command_list::
     inc     a
     ld      [command_list_length], a
 
+    ; If the command buffer is full, wait for blank and draw.
+    sub     a, COMMANDS_PER_FRAME_MAX
+    jr      c, .list_limit_ok
+    call    wait_vblank
+    call    apply_command_list
+    ASSERT_NOT_BUSY     ; If the vblank period ended while applying the command
+                        ; list, undefined behavior may have occurred.
+                        ; The assert will halt the program for debug purposes.
+
+.list_limit_ok
     ret
 
 
@@ -102,17 +114,8 @@ apply_command_list::
     inc	    c
     jr      .skip
 .loop
-    ; If COMMANDS_PER_FRAME_MAX have already been written, wait until the next
-    ; vblank before continuing.
-    dec     b
-    jr      nz, .skip_vblank
-    ld      b, COMMANDS_PER_FRAME_MAX
-    push    hl
-    call    wait_vblank
-    pop     hl
 
 .skip_vblank
-    push    bc
 
     ld      a, [hl+]
     ld      d, a                ; dest high byte
@@ -152,7 +155,6 @@ apply_command_list::
     ld      [hl], a             ; save result
 
     pop     hl
-    pop     bc
 
 .skip
     dec	    c
