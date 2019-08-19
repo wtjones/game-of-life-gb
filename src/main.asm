@@ -36,8 +36,6 @@ start::
     call    test_mode
 
 .main_loop:
-    xor     a
-    ld      [command_list_length], a
 
     ld      a, [game_iterations]
     cp      a, 0
@@ -50,9 +48,7 @@ start::
     call    apply_command_list
     xor     a
     ld      [command_list_length], a
-    ASSERT_NOT_BUSY     ; If the vblank period ended while applying the command
-                        ; list, undefined behavior may have occurred.
-                        ; The assert will halt the program for debug purposes.
+
     jr      .main_loop
 
 draw:
