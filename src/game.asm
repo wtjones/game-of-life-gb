@@ -16,10 +16,10 @@ init_game::
     xor a
     ld      [game_iterations], a
     call    get_cell_buffers
-    push    hl
-    push    de
-    pop     hl
-    pop     de
+    ; push    hl
+    ; push    de
+    ; pop     hl
+    ; pop     de
     ; set a few initial cells
     ld      [hl], %10000001
     inc     hl
@@ -111,7 +111,7 @@ iterate_game::
 
     push    bc
     push    hl
-    ld      d, 6
+    ld      d, b
     ld      e, c
     ld      h, 1
 
@@ -143,7 +143,7 @@ iterate_game::
     rrca
     ld      [cell_mask], a
     ; did it wrap?
-    cp      a, 1
+    cp      a, %10000000
     ;DBGMSG "mask wrapped"
     jp      nz, .did_not_wrap
     inc     hl ; move to next byte of cell buffer

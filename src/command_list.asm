@@ -94,14 +94,17 @@ push_command_list::
 
     ; If the command buffer is full, wait for blank and draw.
     sub     a, COMMANDS_PER_FRAME_MAX
-    jr      c, .list_limit_ok
+    jr      z, .list_limit
+    ret
+.list_limit
     call    wait_vblank
     call    apply_command_list
     ASSERT_NOT_BUSY     ; If the vblank period ended while applying the command
                         ; list, undefined behavior may have occurred.
                         ; The assert will halt the program for debug purposes.
+    xor     a
+    ld      [command_list_length], a
 
-.list_limit_ok
     ret
 
 
