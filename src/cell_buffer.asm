@@ -12,14 +12,17 @@ SECTION "cell buffer vars", WRAM0
 cell_buffer_0: DS CELL_BUFFER_BYTES
 cell_buffer_1: DS CELL_BUFFER_BYTES
 neighbor_count_buffer: DS CELL_BUFFER_WIDTH
-;neighbor_
-current_cell_buffer: DS 2
-successor_cell_buffer: DS 2
 current_cell_buffer_low: DS 1
 current_cell_buffer_high: DS 1
 successor_cell_buffer_low: DS 1
 successor_cell_buffer_high: DS 1
+current_cell_buffer_iterator_low: DS 1
+current_cell_buffer_iterator_high: DS 1
+successor_cell_buffer_iterator_low: DS 1
+successor_cell_buffer_iterator_high: DS 1
 cell_mask:: DS 1
+cell_buffer_x:: DS 1
+cell_buffer_y:: DS 1
 cell_neighbor_count: DS 1
 
 SECTION "cell buffer code", ROM0
@@ -64,8 +67,6 @@ init_cell_buffer::
     ret
 
 swap_cell_buffers::
-
-
     ld      a, [successor_cell_buffer_high]
     ld      h, a
     ld      a, [current_cell_buffer_high]
@@ -79,23 +80,6 @@ swap_cell_buffers::
     ld      [successor_cell_buffer_low], a
     ld      a, h
     ld      [current_cell_buffer_low], a
-
-
-    ; call    get_cell_buffers
-    ; push    hl
-    ; ld      hl, current_cell_buffer
-    ; ld      a, d
-    ; ld      [hl+], a
-    ; ld      a, e
-    ; ld      [hl], a
-
-    ; pop     de
-    ; ld      hl, successor_cell_buffer
-    ; ld      a, d
-    ; ld      [hl+], a
-    ; ld      a, e
-    ; ld      [hl], a
-
     ret
 
 
@@ -138,149 +122,100 @@ get_cell_buffers::
     ld      e, a
     ret
 
-
-    ; ld      hl, successor_cell_buffer
-    ; ld      a, [hl+]
-    ; ld      d, a
-    ; ld      a, [hl]
-    ; ld      e, a
-    ; push    de
-
-    ; ld      hl, current_cell_buffer
-    ; ld      a, [hl+]
-    ; ld      d, a
-    ; ld      a, [hl]
-    ; ld      e, a
-    ; push    de
-    ; pop     hl
-    ; pop     de
-
-    ; ret
-
-
-
-; Inputs
-;   hl = current buffer
+; Output
 ;   b = x
 ;   c = y
-; Outputs
-;   d = active cells
-get_neighbors::
-
-    push    hl
-    call    get_cell_up
-    ld      [cell_neighbor_count], a
-    pop     hl
-
-    ld      a, [cell_neighbor_count]
-    ld      d, a
-    ret
-
-
-
-
-
-; Inputs
-;   hl = current buffer
-;   b = x
-;   c = y
-; Outputs
-;   a = active cells
-get_cell_up:
-
-; is x > 0?
+;   h = current cell value
+;   l = total neighbors
+;   a = items remaining boolean
+init_cell_buffer_iterator::
     xor     a
-    cp      a, c
-    jp      z, .not_at_boundary
-    ld      a, 0
-    ret
-.not_at_boundary
-; get 0, -1
-    ld      d, 0
-    ld      e, CELL_BUFFER_ABOVE_OFFSET
-    add     hl, de
+    ld      [cell_buffer_x], a
+    ld      [cell_buffer_y], a
+    ld      a, %10000000
+    ld      [cell_mask], a
 
+    ; set buffer pointers to start of buffers
+    call    get_cell_buffers
+    ld      a, h
+    ld      [current_cell_buffer_iterator_high], a
+    ld      a, l
+    ld      [current_cell_buffer_iterator_low], a
+    ld      a, d
+    ld      [successor_cell_buffer_iterator_high], a
+    ld      a, e
+    ld      [successor_cell_buffer_iterator_low], a
+
+
+    ; TODO : init count buffer
+
+    ; read the cell state
     ld      a, [cell_mask]
     and     a, [hl]
     ; is result zero?
-    jp      nz, .cell_is_set
+    jp      z, .cell_not_set
+    ld      h, 1
+    jp      .continue
+.cell_not_set
+    ld      h, 0
+.continue
+
+    ret     1
+
+
+inc_cell_buffer_iterator::
+
+    ; increment x
+    ld      a, [cell_buffer_x]
+    inc     a
+    cp      CELL_BUFFER_WIDTH
+    jp      nz, .reset_x_skip
     xor     a
-    ret
-.cell_is_set
-    ld      a, 1
-    ret
+.reset_x_skip
+    ld      [cell_buffer_y], a
 
+    ld      a, [current_cell_buffer_iterator_high]
+    ld      h, a
+    ld      a, [current_cell_buffer_iterator_low]
+    ld      l, a
+    ld      a, [successor_cell_buffer_iterator_high]
+    ld      d, a
+    ld      a, [successor_cell_buffer_iterator_low]
+    ld      e, a
 
-; Inputs
-;   hl = current buffer
-;   b = x
-;   c = y
-; Outputs
-;   a = active cells
-get_cell_up_left:
-; is x > 0?
-    xor     a
-    cp      a, b
-    jp      z, .not_at_top
-    ld      a, 0
-    ret
-
-.not_at_top
-    xor     a
-    cp      a, c
-    jp      z, .not_at_left
-    ld      a, 0
-    ret
-
-.not_at_left
-; get -1, -1
-    ld      d, 0
-    ld      e, CELL_BUFFER_ABOVE_OFFSET
-    add     hl, de
-
-    ; rotate the mask
+    ; rotate mask
     ld      a, [cell_mask]
-    rlca
+    rrca
+    ld      [cell_mask], a
     ; did it wrap?
-    cp      a, 1
+    cp      a, %10000000
+    ;DBGMSG "mask wrapped"
     jp      nz, .did_not_wrap
-    inc     hl      ; move left by one byte
-
+    inc     hl ; move to next byte of cell buffer
+    inc     de
 .did_not_wrap
 
-    and     a, [hl]
-    ; is result zero?
-    jp      nz, .cell_is_set
-    xor     a
+    ld      a, h
+    ld      [current_cell_buffer_iterator_high], a
+    ld      a, l
+    ld      [current_cell_buffer_iterator_low], a
+    ld      a, d
+    ld      [successor_cell_buffer_iterator_high], a
+    ld      a, e
+    ld      [successor_cell_buffer_iterator_low], a
+
+    ; increment y
+    ld      a, [cell_buffer_y]
+    inc     a
+    cp      CELL_BUFFER_HEIGHT
+    jp      nz, .reset_y_skip
+    ld      a, 0    ; return false - iterator complete
     ret
-.cell_is_set
-    ld      a, 1
+.reset_y_skip
+    ld      [cell_buffer_y], a
+    ld      a, 1    ; return true - items remain
     ret
 
-
-
-
-; Writes to the successor buffer
-; Inputs
-;   b = x
-;   c = y
-;   d = value
-set_cell::
-    ld      hl, successor_cell_buffer
-    ld      a, [hl+]
-    ld      d, a
-    ld      a, [hl]
-    ld      l, a
-    ld      h, d
-
-    ld      de, CELL_BUFFER_WIDTH / 8
-
-    CALC_ADDR   ; hl = buffer + (y * CELL_BUFFER_WIDTH / 8)
-                ; hl now points to start of desired row
-
-    ;
-
-    ret
 
 init_neighbor_count_buffer::
     ld      hl, neighbor_count_buffer

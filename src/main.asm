@@ -34,7 +34,8 @@ start::
     cp      0
     jr      z, .main_loop
     call    test_mode
-
+    ; xor     a
+    ; ld      [game_iterations], a
 .main_loop:
 
     ld      a, [game_iterations]

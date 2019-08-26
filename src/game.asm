@@ -58,8 +58,24 @@ init_game::
     ;call    get_cell_buffers     ; buffers in hl, de
     ret
 
-
 iterate_game::
+    DBGMSG "iterate_game"
+    call    init_cell_buffer_iterator
+
+.loop
+
+    ;DBGMSG "iterate..."
+    call    inc_cell_buffer_iterator
+    cp      a
+    jp      nz, .loop
+
+
+    ld      a, [game_iterations]
+    inc     a
+    ld      [game_iterations], a
+    ret
+
+iterate_game2::
     DBGMSG "iterate_game"
 
     ; ld      d, 7
