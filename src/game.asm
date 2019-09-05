@@ -16,38 +16,96 @@ init_game::
     xor a
     ld      [game_iterations], a
     call    get_cell_buffers
+
+    ld      b, 0
+    ld      c, 0
+    call    set_cell
+
+    ld      b, 2
+    ld      c, 0
+    call    set_cell
+
     ; push    hl
     ; push    de
     ; pop     hl
     ; pop     de
     ; set a few initial cells
-    ld      [hl], %10000001
-    inc     hl
-    ld      [hl], %01000010
-    inc     hl
 
-    ld      [hl], %10000001
-    inc     hl
-    ld      [hl], %01000010
-    inc     hl
+    ; ld      bc, CELL_BUFFER_BYTES
+    ; ld      a, %10101010
+    ; call    mem_Set
 
-    inc     hl
-    inc     hl
-    inc     hl
-    inc     hl
-    inc     hl
-    inc     hl
-    inc     hl
-    inc     hl
-    inc     hl
-    inc     hl
-    inc     hl
-    inc     hl
-    inc     hl
-    inc     hl
-    ld      [hl], %10000001
-    inc     hl
-    ld      [hl], %01000010
+    ; ld      [hl], %10000001
+    ; inc     hl
+    ; ld      [hl], %01000010
+    ; inc     hl
+
+    ; ld      [hl], %10000001
+    ; inc     hl
+    ; ld      [hl], %01000010
+    ; inc     hl
+
+    ; ld      d, 0
+    ; ld      e, 0
+    ; ld      h, 1
+    ; call    get_pixel_addr
+    ; call    push_command_list
+    ; ld      d, 7
+    ; ld      e, 0
+    ; ld      h, 1
+    ; call    get_pixel_addr
+    ; call    push_command_list
+    ; ld      d, 9
+    ; ld      e, 0
+    ; ld      h, 1
+    ; call    get_pixel_addr
+    ; call    push_command_list
+    ; ld      d, 14
+    ; ld      e, 0
+    ; ld      h, 1
+    ; call    get_pixel_addr
+    ; call    push_command_list
+
+    ; ld      d, 0
+    ; ld      e, 1
+    ; ld      h, 1
+    ; call    get_pixel_addr
+    ; call    push_command_list
+    ; ld      d, 7
+    ; ld      e, 1
+    ; ld      h, 1
+    ; call    get_pixel_addr
+    ; call    push_command_list
+    ; ld      d, 9
+    ; ld      e, 1
+    ; ld      h, 1
+    ; call    get_pixel_addr
+    ; call    push_command_list
+    ; ld      d, 14
+    ; ld      e, 1
+    ; ld      h, 1
+    ; call    get_pixel_addr
+    ; call    push_command_list
+
+
+
+    ; inc     hl
+    ; inc     hl
+    ; inc     hl
+    ; inc     hl
+    ; inc     hl
+    ; inc     hl
+    ; inc     hl
+    ; inc     hl
+    ; inc     hl
+    ; inc     hl
+    ; inc     hl
+    ; inc     hl
+    ; inc     hl
+    ; inc     hl
+    ; ld      [hl], %10000001
+    ; inc     hl
+    ; ld      [hl], %01000010
 
     ; ld      d, 0
     ; ld      e, 12

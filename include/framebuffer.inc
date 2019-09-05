@@ -16,8 +16,9 @@ FRAMEBUFFER_HEIGHT      EQU 16
 ;   de = row width
 ; Outputs:
 ;   hl = hl + (c * de)
+; Destroys
+;   c
 CALC_ADDR: MACRO
-    ld      c, a
     inc     c
     jp      .calc_addr_skip\@
 .calc_addr_loop\@:

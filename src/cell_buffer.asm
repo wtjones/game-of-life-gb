@@ -128,6 +128,8 @@ get_cell_buffers::
 ;   h = current cell value
 ;   l = total neighbors
 ;   a = items remaining boolean
+; Destroys
+;   de
 init_cell_buffer_iterator::
     xor     a
     ld      [cell_buffer_x], a
@@ -159,10 +161,16 @@ init_cell_buffer_iterator::
 .cell_not_set
     ld      h, 0
 .continue
+    ld      a, 1
+    ret
 
-    ret     1
 
-
+; Output
+;   b = x
+;   c = y
+;   h = current cell value
+;   l = total neighbors
+;   a = items remaining boolean
 inc_cell_buffer_iterator::
 
     ; increment x
@@ -268,4 +276,59 @@ add_cells::
 .skip
     dec     c
     jp      nz, .loop
+    ret
+
+; Input
+;   b = x
+;   c = y
+; Destroys
+;   de, hl
+set_cell::
+    call    get_cell_buffers
+
+    ld      de, CELL_BUFFER_WIDTH / 8
+    push    bc
+    CALC_ADDR   ; hl = buffer + (y * CELL_BUFFER_WIDTH / 8)
+                ; hl now points to start of desired row
+    pop     bc
+
+    ld      a, b
+    sra     a
+    sra     a
+    sra     a
+    sla     a
+    sla     a
+    sla     a
+    ;sub     a, b    ; a = x offset aligned to byte
+
+    ld      e, a
+    ld      a, b
+    sub     a, e    ; a = x offset aligned to byte
+
+
+    ld      e, a
+    ;  subtract 7 from the x offset to determine # of shifts
+    ld      a, 7
+    sub     e
+    ld      c, a
+    inc     c
+
+    ld      b, %00000001
+    jp      .skip
+.loop
+    sla     b
+
+.skip
+    dec     c
+    jp      nz, .loop
+
+    ; invert mask
+    ; ld      a, b
+    ; cpl
+    ; ld      b, a
+    ld      a, b
+    or      a, [hl]
+    ld      [hl], a
+
+
     ret
