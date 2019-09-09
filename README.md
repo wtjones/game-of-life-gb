@@ -10,13 +10,20 @@ The Game Boy assembler [RGBDS](https://github.com/rednex/rgbds/) is needed.
 
 Build and install as specified on the `RGBDS` project site.
 
-Run `make`
+Run `make -B`
 
 ### Windows
 
 From the shell for the [Windows Subsystem for Linux](https://docs.microsoft.com/en-us/windows/wsl/install-win10), install `RGBDS`.
 
-Run either `make` from the WSL shell or `wsl make` from PowerShell.
+Run either `make` from the WSL shell or `wsl make -B` from PowerShell.
+
+### Test Mode
+
+    framebuffer tests
+
+    - flood fill: `make test1 -B`
+
 
 ### Output
 

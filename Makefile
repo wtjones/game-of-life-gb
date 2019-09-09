@@ -24,8 +24,9 @@ MODE = 0			# default to game mode
 test1 : MODE = 1	# test mode 1
 test2 : MODE = 2	# test mode 2
 test3 : MODE = 3	# test mode 3
+test4 : MODE = 4	# test mode 4
 
-all test1 test2 test3: create_build_dir $(OUTPUT)
+all test1 test2 test3 test4: create_build_dir $(OUTPUT)
 
 create_build_dir:
 	mkdir -p $(BUILD_DIR)

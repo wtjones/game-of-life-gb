@@ -32,16 +32,27 @@ start::
     ld      hl, initial_mode
     ld      a, [hl]
     cp      0
-    jr      z, .main_loop
+    jr      z, .main
     call    test_mode
 
+.main:
+    call    init_game
+    xor     a
+    ld      [game_iterations], a
 .main_loop:
+
+    ld      a, [game_iterations]
+    cp      a, 0
+    jr      nz, .iterated
+    call    iterate_game
+.iterated
+    ;call    swap_cell_buffers
+    ; TODO
+    call    wait_vblank
+    call    apply_command_list
     xor     a
     ld      [command_list_length], a
 
-    ; TODO: Although vblank + draw is handled while pushing commands,
-    ;       it might be good to force a draw after an iteration if commands
-    ;       exist.
     jr      .main_loop
 
 draw:

@@ -1,5 +1,6 @@
 INCLUDE "debug.inc"
 INCLUDE "framebuffer.inc"
+INCLUDE "game.inc"
 
 PIXELS_PER_FRAME        EQU 12
 
@@ -15,15 +16,20 @@ SECTION "test mode utility", ROM0
 ; Inputs:
 ;   a = mode in 1, 2, 3
 test_mode::
+    DBGMSG "test mode..."
     cp      1
     jr      nz, .skip1
     call    flood_fill
 .skip1
     cp      2
     jr      nz, .skip2
-    call static_pixels
+    call    static_pixels
 .skip2
-    call random_fill
+    cp      3
+    jr      nz, .skip3
+    call    random_fill
+.skip3
+    call    static_set_cell_buffer
     ret
 
 
@@ -185,3 +191,36 @@ random_fill:
                         ; list, undefined behavior may have occurred.
                         ; The assert will halt the program for debug purposes.
     jr      .test_loop
+
+
+static_set_cell_buffer:
+    DBGMSG "test cell buffer"
+    call    init_cell_buffer
+    xor a
+    ld      [game_iterations], a
+    call    get_cell_buffers
+
+    ld      b, 0
+    ld      c, 0
+    INIT_CELL
+
+    ld      b, 15
+    ld      c, 0
+    INIT_CELL
+
+    ld      b, 1
+    ld      c, 1
+    INIT_CELL
+
+    ld      b, 14
+    ld      c, 1
+    INIT_CELL
+
+    call    wait_vblank
+    call    apply_command_list
+    xor     a
+    ld      [command_list_length], a
+.test_loop
+    halt
+    jr      .test_loop
+    ret
