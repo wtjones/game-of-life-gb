@@ -37,21 +37,18 @@ start::
 
 .main:
     call    init_game
-    xor     a
-    ld      [game_iterations], a
 .main_loop:
 
-    ld      a, [game_iterations]
-    cp      a, 0
-    jr      nz, .iterated
+    ;ld      a, [game_iterations]
+    ; cp      a, 0
+    ; jr      nz, .iterated
     call    iterate_game
+
 .iterated
     ;call    swap_cell_buffers
     ; TODO
     call    wait_vblank
     call    apply_command_list
-    xor     a
-    ld      [command_list_length], a
 
     jr      .main_loop
 

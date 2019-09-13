@@ -44,18 +44,41 @@ init_game::
     ld      [command_list_length], a
     ret
 
+
+; Perform one generaton
 iterate_game::
     DBGMSG "iterate_game"
+
     call    init_cell_buffer_iterator
-
 .loop
+    ; iterator sets the following:
+    ;   h = current cell value
 
+
+
+
+
+    ; just invert the value as a test
+    ;ld      a, [cell_buffer_x]
+    ld      d, b
+    ;ld      a, [cell_buffer_y]
+    ld      e, c
+    ld      h, 1
+    call    get_pixel_addr
+    call    push_command_list
+
+    call    wait_vblank
+    call    apply_command_list
+
+    DBGMSG "incrementing iterator"
     call    inc_cell_buffer_iterator
-    cp      a
-    jp      nz, .loop
 
+    cp      a
+    jp      z, .loop
 
     ld      a, [game_iterations]
     inc     a
     ld      [game_iterations], a
+    call    swap_cell_buffers
+    DBGMSG "iterate_game end"
     ret

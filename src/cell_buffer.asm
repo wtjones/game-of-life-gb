@@ -92,6 +92,8 @@ get_cell_buffers::
 ;   de
 init_cell_buffer_iterator::
     xor     a
+    ld      b, 0
+    ld      c, 0
     ld      [cell_buffer_x], a
     ld      [cell_buffer_y], a
     ld      a, %10000000
@@ -138,10 +140,28 @@ inc_cell_buffer_iterator::
     inc     a
     cp      CELL_BUFFER_WIDTH
     jp      nz, .reset_x_skip
+    DBGMSG  "iterator at end of row"
     xor     a
-.reset_x_skip
-    ld      [cell_buffer_y], a
+    ld      [cell_buffer_x], a
 
+    ; increment y
+    ld      a, [cell_buffer_y]
+    inc     a
+    cp      CELL_BUFFER_HEIGHT
+    jp      nz, .reset_y_skip
+    ld      c, a
+    DBGMSG "iterator at end"
+    ld      a, 0    ; return false - iterator complete
+    ret
+.reset_y_skip
+    ld      [cell_buffer_y], a
+    ld      c, a
+    jp      .continue
+.reset_x_skip
+    ld      [cell_buffer_x], a
+    ld      b, a
+
+.continue
     ld      a, [current_cell_buffer_iterator_high]
     ld      h, a
     ld      a, [current_cell_buffer_iterator_low]
@@ -172,15 +192,10 @@ inc_cell_buffer_iterator::
     ld      a, e
     ld      [successor_cell_buffer_iterator_low], a
 
-    ; increment y
+    ld      a, [cell_buffer_x]
+    ld      b, a
     ld      a, [cell_buffer_y]
-    inc     a
-    cp      CELL_BUFFER_HEIGHT
-    jp      nz, .reset_y_skip
-    ld      a, 0    ; return false - iterator complete
-    ret
-.reset_y_skip
-    ld      [cell_buffer_y], a
+    ld      c, a
     ld      a, 1    ; return true - items remain
     ret
 

@@ -163,4 +163,6 @@ apply_command_list::
 .skip
     dec	    c
     jr      nz,.loop
+    xor     a
+    ld      [command_list_length], a
     ret
