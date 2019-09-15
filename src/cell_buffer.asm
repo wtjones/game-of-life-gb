@@ -20,6 +20,8 @@ current_cell_buffer_iterator_low: DS 1
 current_cell_buffer_iterator_high: DS 1
 successor_cell_buffer_iterator_low: DS 1
 successor_cell_buffer_iterator_high: DS 1
+current_cell_buffer_iterator_value:: DS 1
+successor_cell_buffer_iterator_value:: DS 1
 cell_mask:: DS 1
 cell_buffer_x:: DS 1
 cell_buffer_y:: DS 1
@@ -113,16 +115,15 @@ init_cell_buffer_iterator::
 
     ; TODO : init count buffer
 
-    ; read the cell state
-    ld      a, [cell_mask]
-    and     a, [hl]
-    ; is result zero?
-    jp      z, .cell_not_set
-    ld      h, 1
-    jp      .continue
-.cell_not_set
-    ld      h, 0
-.continue
+
+    call    get_cell_value
+    ld      [current_cell_buffer_iterator_value], a
+
+    ld      h, d
+    ld      l, e
+    call    get_cell_value
+    ld      [successor_cell_buffer_iterator_value], a
+
     ld      a, 1
     ret
 
@@ -140,7 +141,6 @@ inc_cell_buffer_iterator::
     inc     a
     cp      CELL_BUFFER_WIDTH
     jp      nz, .reset_x_skip
-    DBGMSG  "iterator at end of row"
     xor     a
     ld      [cell_buffer_x], a
 
@@ -192,12 +192,40 @@ inc_cell_buffer_iterator::
     ld      a, e
     ld      [successor_cell_buffer_iterator_low], a
 
+    call    get_cell_value
+    ld      [current_cell_buffer_iterator_value], a
+
+    ; get cell state of sucessor x/y
+    ld      h, d
+    ld      l, e
+    call    get_cell_value
+    ld      [successor_cell_buffer_iterator_value], a
+
     ld      a, [cell_buffer_x]
     ld      b, a
     ld      a, [cell_buffer_y]
     ld      c, a
     ld      a, 1    ; return true - items remain
     ret
+
+
+
+; Inputs
+;   hl = address of byte in cell buffer
+; Outputs
+;   a = value
+get_cell_value
+ ; get cell state of current x/y
+    ld      a, [cell_mask]
+    and     a, [hl]
+    ; is result zero?
+    jp      nz, .cell_is_set
+    ld      a, 0
+    jr      .cell_is_set_continue
+.cell_is_set
+    ld      a, 1
+.cell_is_set_continue
+ret
 
 
 init_neighbor_count_buffer::
@@ -253,7 +281,34 @@ add_cells::
     jp      nz, .loop
     ret
 
-; Input sets a cell (sets the bit) in the cell buffer
+
+; Set the value of the iterated successor cell
+; Input
+;   d = cell value
+; Destroys
+;   hl
+set_cell_buffer_iterator_value::
+    ld      a, [successor_cell_buffer_iterator_high]
+    ld      h, a
+    ld      a, [successor_cell_buffer_iterator_low]
+    ld      l, a
+
+    ld      a, [cell_mask]
+    cpl                         ; invert mask
+    and     a, [hl]             ; apply mask to clear target bit
+    ld      [hl], a             ; save result
+    ld      a, d
+    cp      0
+    jr      z, .skip            ; if a = 0
+    ld      a, [cell_mask]
+    or      a, [hl]             ; set value
+    ld      [hl], a             ; save result
+.skip
+    ret
+
+
+; Sets a cell (sets the bit) in the cell buffer
+; Input
 ;   b = x
 ;   c = y
 ; Destroys

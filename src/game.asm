@@ -36,8 +36,6 @@ init_game::
     ld      c, 1
     INIT_CELL
 
-    call swap_cell_buffers      ; initialized cells are now successors
-
     call    wait_vblank
     call    apply_command_list
     xor     a
@@ -52,29 +50,34 @@ iterate_game::
     call    init_cell_buffer_iterator
 .loop
     ; iterator sets the following:
-    ;   h = current cell value
+    ;   b = x
+    ;   c = y
 
+    ld      a, [current_cell_buffer_iterator_value]
 
+    cp      1
+    jr      z, .is_set  ; if a = 1
+    ld      d, 1
+    jr      .continue
+.is_set
+    ld      d, 0
+.continue       ; d is now inverse of current cell
 
+    call set_cell_buffer_iterator_value
 
-
-    ; just invert the value as a test
-    ;ld      a, [cell_buffer_x]
+    ld      h, d
     ld      d, b
-    ;ld      a, [cell_buffer_y]
     ld      e, c
-    ld      h, 1
     call    get_pixel_addr
     call    push_command_list
 
     call    wait_vblank
     call    apply_command_list
 
-    DBGMSG "incrementing iterator"
     call    inc_cell_buffer_iterator
 
-    cp      a
-    jp      z, .loop
+    cp      1
+    jp      z, .loop     ; if a = 1
 
     ld      a, [game_iterations]
     inc     a
