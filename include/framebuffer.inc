@@ -1,7 +1,7 @@
 IF      !DEF(FRAMEBUFFER_ASM)
 FRAMEBUFFER_ASM     SET  1
 
-INCLUDE        "gbhw.inc"
+INCLUDE "gbhw.inc"
 
 FRAMEBUFFER_MAX         EQU 250 * 64    ; Must use fewer than 255 tile indexes
                                         ; to account for the border, so

@@ -1,7 +1,7 @@
 IF      !DEF(GAME_ASM)
 GAME_ASM     SET  1
 
-INCLUDE        "gbhw.inc"
+INCLUDE "gbhw.inc"
 
 ; Set a cell in the cell buffer and push to command list
 ; Inputs

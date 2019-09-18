@@ -1,9 +1,7 @@
 INCLUDE "debug.inc"
 INCLUDE "framebuffer.inc"
 INCLUDE "game.inc"
-
-CELL_BUFFER_WIDTH EQU FRAMEBUFFER_WIDTH
-CELL_BUFFER_HEIGHT EQU FRAMEBUFFER_HEIGHT
+INCLUDE "cell_buffer.inc"
 
 
 SECTION "game vars", WRAM0
