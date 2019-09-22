@@ -2,18 +2,15 @@ INCLUDE "debug.inc"
 INCLUDE "framebuffer.inc"
 INCLUDE "cell_buffer.inc"
 
-
 SECTION "cell buffer vars", WRAM0
 
 cell_buffer_0: DS CELL_BUFFER_BYTES
 cell_buffer_1: DS CELL_BUFFER_BYTES
-neighbor_count_buffer: DS CELL_BUFFER_WIDTH
 current_cell_buffer_low: DS 1
 current_cell_buffer_high: DS 1
 successor_cell_buffer_low: DS 1
 successor_cell_buffer_high: DS 1
 cell_mask: DS 1
-cell_neighbor_count: DS 1
 
 SECTION "cell buffer code", ROM0
 
@@ -69,60 +66,6 @@ get_cell_buffers::
     ld      d, a
     ld      a, [successor_cell_buffer_low]
     ld      e, a
-    ret
-
-
-init_neighbor_count_buffer::
-    ld      hl, neighbor_count_buffer
-    ld      bc, CELL_BUFFER_HEIGHT
-    ld      a, $00
-    call    mem_Set
-    ret
-
-; Inputs
-;   hl = start of source cell buffer row
-; Destroys
-;   de, bc
-add_cells::
-    ld      de, neighbor_count_buffer
-    ld      a, %10000000
-    ld      [cell_mask], a
-    ld      c, CELL_BUFFER_WIDTH
-    inc     c
-    jp      .skip
-.loop
-    ; read the cell state
-    ld      a, [cell_mask]
-    and     a, [hl]
-    ; is result zero?
-    jp      nz, .cell_is_set
-    ld      b, 0
-.cell_is_set
-    ld      b, 1
-    ; b now has the cell state - TODO FIX
-
-
-    ; perform an add of the cell value to the current buffer record
-    ld      a, [de]
-    add     a, b
-    ld      [de], a
-
-    ; rotate the mask
-    ld      a, [cell_mask]
-    rrca
-    ld      [cell_mask], a
-    ; did it wrap?
-    cp      a, 1
-    ;DBGMSG "mask wrapped"
-    jp      nz, .did_not_wrap
-    inc     hl ; move to next byte of cell buffer
-.did_not_wrap
-
-
-    inc     de  ; move to next byte in count buffer
-.skip
-    dec     c
-    jp      nz, .loop
     ret
 
 

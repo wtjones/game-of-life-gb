@@ -46,12 +46,17 @@ init_cell_buffer_iterator::
     ld      [successor_cell_buffer_iterator_low], a
 
 
-    ; TODO : init count buffer
+    push    hl
+    push    bc
+    call    init_neighbor_count_buffer
+    pop     bc
+    pop     hl
 
-
+    ; prime the current cell value
     call    get_cell_value
     ld      [current_cell_buffer_iterator_value], a
 
+    ; prime the sucessor cell value
     ld      h, d
     ld      l, e
     call    get_cell_value
