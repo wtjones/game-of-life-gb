@@ -34,6 +34,14 @@ init_game::
     ld      c, 1
     INIT_CELL
 
+    ld      b, 0
+    ld      c, 2
+    INIT_CELL
+
+    ld      b, 15
+    ld      c, 2
+    INIT_CELL
+
     call    wait_vblank
     call    apply_command_list
     xor     a

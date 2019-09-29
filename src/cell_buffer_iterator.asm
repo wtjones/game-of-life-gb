@@ -4,11 +4,11 @@ INCLUDE "cell_buffer.inc"
 
 SECTION "cell buffer iterator vars", WRAM0
 
-current_cell_buffer_iterator_low: DS 1
-current_cell_buffer_iterator_high: DS 1
-successor_cell_buffer_iterator_low: DS 1
-successor_cell_buffer_iterator_high: DS 1
+current_cell_buffer_iterator_high:: DS 1
+current_cell_buffer_iterator_low:: DS 1
 current_cell_buffer_iterator_value:: DS 1
+successor_cell_buffer_iterator_high: DS 1
+successor_cell_buffer_iterator_low: DS 1
 successor_cell_buffer_iterator_value:: DS 1
 cell_buffer_iterator_mask: DS 1
 cell_buffer_x:: DS 1
@@ -130,6 +130,7 @@ inc_cell_buffer_iterator::
     ld      a, e
     ld      [successor_cell_buffer_iterator_low], a
 
+    ; get cell state of current x/y
     call    get_cell_value
     ld      [current_cell_buffer_iterator_value], a
 
@@ -139,13 +140,24 @@ inc_cell_buffer_iterator::
     call    get_cell_value
     ld      [successor_cell_buffer_iterator_value], a
 
+    ; if at start of a row, update the count buffer
+    ld      a, [cell_buffer_x]
+    cp      0
+    jr      nz, .skip_count_row         ; if a != 0
+    push    hl
+    push    bc
+    call    inc_neighbor_count_buffer
+    pop     bc
+    pop     hl
+.skip_count_row                         ; end if
+
     ld      a, [cell_buffer_x]
     ld      b, a
     ld      a, [cell_buffer_y]
     ld      c, a
+
     ld      a, 1    ; return true - items remain
     ret
-
 
 
 ; Inputs
@@ -185,7 +197,7 @@ set_cell_buffer_iterator_value::
     cp      0
     jr      z, .skip            ; if a = 0
     ld      a, [cell_buffer_iterator_mask]
-    or      a, [hl]             ; set value
-    ld      [hl], a             ; save result
-.skip
+    or      a, [hl]             ;   set value
+    ld      [hl], a             ;   save result
+.skip                           ; end if
     ret

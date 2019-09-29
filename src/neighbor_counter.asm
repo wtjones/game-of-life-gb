@@ -4,8 +4,11 @@ INCLUDE "cell_buffer.inc"
 
 SECTION "cell buffer counter vars", WRAM0
 
-; Each byte of the count buffer maintains a running total of current
-; iterated cell, the cell above, and the cell below.
+; Each byte of the count buffer maintains a running total of the column of
+; cells consisting of:
+; - the current iterated cell
+; - the cell above
+; - the cell below
 neighbor_count_buffer: DS CELL_BUFFER_WIDTH
 neighbor_count_mask: DS 1
 cell_neighbor_count: DS 1
@@ -27,7 +30,7 @@ init_neighbor_count_buffer::
 
     push    hl
     ld      b, 1
-    call    count_rows
+    call    count_row
     pop     hl
 
     ld      d, 0                        ; move hl to 2nd row
@@ -35,17 +38,69 @@ init_neighbor_count_buffer::
     add     hl, de
 
     ld      b, 1
-    call    count_rows
+    call    count_row
 
+    ret
+
+; Update the count buffer by:
+;   - Subtracting the cells from the 2nd to last row
+;   - Adding the cells of the next row
+; Inputs
+;   hl = start of source cell buffer row
+; Destroys
+;   hl, de, bc
+inc_neighbor_count_buffer::
+
+    ld      a, [current_cell_buffer_iterator_high]
+    ld      h, a
+    ld      a, [current_cell_buffer_iterator_low]
+    ld      l, a
+
+    ; Subtract values of 2nd to last row
+
+    ld      a, [cell_buffer_y]
+    cp      1
+    jr      z, .skip_count_prior_row   ; if y !== 1
+    push    hl
+    ;ld      d, 0
+    ; perform hl = hl - width
+    ld      e, CELL_BUFFER_ROW_BYTES * 2
+    ld      a, l
+    sub     a, e
+    jr      nc, .skip_sub_carry             ;if e > a
+    ld      l, a
+    ld      a, h
+    dec     a
+    ld      h, a                                ; h = h - 1
+    jr      .continue_sub_carry
+.skip_sub_carry                             ; end if
+    ld      l, a
+.continue_sub_carry
+    ld      b, -1                           ; subtract operation
+    call    count_row
+    pop     hl
+.skip_count_prior_row                   ; end if
+
+    ; Add values of next row
+
+    ld      a, [cell_buffer_y]
+    cp      CELL_BUFFER_HEIGHT - 1
+    jr      z, .skip_count_next_row   ; if y !== last row
+    ld      d, 0
+    ld      e, CELL_BUFFER_ROW_BYTES
+    add     hl, de                          ; move hl to next row
+    ld      b, 1                            ; add operation
+    call    count_row
+.skip_count_next_row                   ; end if
     ret
 
 
 ; Inputs
-;   hl = start of source cell buffer row;
+;   hl = start of source cell buffer row
 ;   b = add operation value (1 or -1)
 ; Destroys
 ;   de, bc
-count_rows::
+count_row:
     ld      de, neighbor_count_buffer
     ld      a, %10000000
     ld      [neighbor_count_mask], a
