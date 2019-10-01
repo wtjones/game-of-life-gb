@@ -13,7 +13,6 @@ successor_cell_buffer_iterator_value:: DS 1
 cell_buffer_iterator_mask: DS 1
 cell_buffer_x:: DS 1
 cell_buffer_y:: DS 1
-cell_neighbor_count: DS 1
 
 SECTION "cell buffer iterator code", ROM0
 
@@ -150,7 +149,7 @@ inc_cell_buffer_iterator::
     pop     bc
     pop     hl
 .skip_count_row                         ; end if
-
+    call    inc_neighbor_count
     ld      a, [cell_buffer_x]
     ld      b, a
     ld      a, [cell_buffer_y]

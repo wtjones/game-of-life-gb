@@ -2,7 +2,7 @@ INCLUDE "debug.inc"
 INCLUDE "framebuffer.inc"
 INCLUDE "cell_buffer.inc"
 
-SECTION "cell buffer counter vars", WRAM0
+SECTION "neighbor counter vars", WRAM0
 
 ; Each byte of the count buffer maintains a running total of the column of
 ; cells consisting of:
@@ -11,14 +11,16 @@ SECTION "cell buffer counter vars", WRAM0
 ; - the cell below
 neighbor_count_buffer: DS CELL_BUFFER_WIDTH
 neighbor_count_mask: DS 1
-cell_neighbor_count: DS 1
+neighbor_count_iterator_high:: DS 1
+neighbor_count_iterator_low:: DS 1
+cell_neighbor_count:: DS 1
 
-SECTION "cell buffer counter code", ROM0
+SECTION "neighbor counter code", ROM0
 
 ; Sum the cell states of the first two rows. This primes the count buffer
 ; for the iteration of the first row of the cell buffer.
 ; Destroys
-;   hl, bc
+;   hl, bc, de
 init_neighbor_count_buffer::
     ld      hl, neighbor_count_buffer
     ld      bc, CELL_BUFFER_WIDTH
@@ -40,17 +42,24 @@ init_neighbor_count_buffer::
     ld      b, 1
     call    count_row
 
+    ; prime iterator
+    call init_neighbor_count_iterator
+    call inc_neighbor_count
+
     ret
 
 ; Update the count buffer by:
-;   - Subtracting the cells from the 2nd to last row
-;   - Adding the cells of the next row
+;   - Subtracting the cells from row y - 2
+;   - Adding the cells of the next row (y + 1)
 ; Inputs
 ;   hl = start of source cell buffer row
 ; Destroys
 ;   hl, de, bc
 inc_neighbor_count_buffer::
+    ; reset neighbor count iterator
+    call init_neighbor_count_iterator
 
+    ld      hl, neighbor_count_buffer
     ld      a, [current_cell_buffer_iterator_high]
     ld      h, a
     ld      a, [current_cell_buffer_iterator_low]
@@ -92,6 +101,56 @@ inc_neighbor_count_buffer::
     ld      b, 1                            ; add operation
     call    count_row
 .skip_count_next_row                   ; end if
+    ret
+
+
+; Using the count buffer, updates cell_neighbor_count based on the current
+; cell buffer position.
+; Destroys:
+;   hl
+inc_neighbor_count::
+    ld      a, [neighbor_count_iterator_high]
+    ld      h, a
+    ld      a, [neighbor_count_iterator_low]
+    ld      l, a
+
+    ld      a, [hl]
+    ld      d, a                        ; d = count
+
+    ; if not at left bounds, add count of column left of current cell
+    ld      a, [cell_buffer_x]
+    ld      b, a                        ; b = x
+    cp      0
+    jr      z, .skip_count_prior_byte   ; if x != 0
+    dec     hl
+    ld      a, [hl]
+    add     a, d
+    ld      d, a
+    inc     hl
+.skip_count_prior_byte                  ; end if
+
+    ; if not at right bounds, add count of column right of current cell
+    ld      a, b
+    cp      CELL_BUFFER_WIDTH - 1
+    jr      z, .skip_count_next_byte    ; if x != max
+    inc     hl
+    ld      a, d
+    add     a, [hl]
+    ld      [cell_neighbor_count], a        ; update the neighbor count
+.skip_count_next_byte                   ; end if
+    ld      a, h
+    ld      [neighbor_count_iterator_high], a
+    ld      a, l
+    ld      [neighbor_count_iterator_low], a
+    ret
+
+; Init iteratgor to start of count buffer
+init_neighbor_count_iterator:
+    ld      hl, neighbor_count_buffer
+    ld      a, h
+    ld      [neighbor_count_iterator_high], a
+    ld      a, l
+    ld      [neighbor_count_iterator_low], a
     ret
 
 

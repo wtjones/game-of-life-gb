@@ -59,6 +59,7 @@ iterate_game::
     ;   b = x
     ;   c = y
 
+    ld      a, [cell_neighbor_count]
     ld      a, [current_cell_buffer_iterator_value]
 
     cp      1
