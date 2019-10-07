@@ -44,13 +44,6 @@ init_cell_buffer_iterator::
     ld      a, e
     ld      [successor_cell_buffer_iterator_low], a
 
-
-    push    hl
-    push    bc
-    call    init_neighbor_count_buffer
-    pop     bc
-    pop     hl
-
     ; prime the current cell value
     call    get_cell_value
     ld      [current_cell_buffer_iterator_value], a
@@ -60,6 +53,12 @@ init_cell_buffer_iterator::
     ld      l, e
     call    get_cell_value
     ld      [successor_cell_buffer_iterator_value], a
+
+    push    hl
+    push    bc
+    call    init_neighbor_count_buffer
+    pop     bc
+    pop     hl
 
     ld      a, 1
     ret

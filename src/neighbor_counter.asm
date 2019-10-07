@@ -104,7 +104,7 @@ inc_neighbor_count_buffer::
     ret
 
 
-; Using the count buffer, updates cell_neighbor_count based on the current
+; Using the count buffer, update cell_neighbor_count based on the current
 ; cell buffer position.
 ; Destroys:
 ;   hl
@@ -142,7 +142,17 @@ inc_neighbor_count::
     ld      [neighbor_count_iterator_high], a
     ld      a, l
     ld      [neighbor_count_iterator_low], a
+
+    ; if the current cell is set, subtract 1 from the count
+    ld      a, [current_cell_buffer_iterator_value]
+    cp      1
+    jr      nz, .skip_subtract_current  ; if a == 1
+    ld      a, [cell_neighbor_count]
+    dec     a
+    ld      [cell_neighbor_count], a        ; update the neighbor count
+.skip_subtract_current                  ; end if
     ret
+
 
 ; Init iteratgor to start of count buffer
 init_neighbor_count_iterator:
