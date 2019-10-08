@@ -59,16 +59,44 @@ iterate_game::
     ;   b = x
     ;   c = y
 
-    ld      a, [cell_neighbor_count]
-    ld      a, [current_cell_buffer_iterator_value]
+    ; Determine new state of cell: (Wikipedia)
+    ; 1. Any live cell with fewer than two live neighbours dies, as if by
+    ;    underpopulation.
+    ; 2. Any live cell with two or three live neighbours lives on to the next
+    ;    generation.
+    ; 3. Any live cell with more than three live neighbours dies, as if by
+    ;    overpopulation.
+    ; 4. Any dead cell with exactly three live neighbours becomes a live cell,
+    ;    as if by reproduction.
 
+    ld      a, [current_cell_buffer_iterator_value]
     cp      1
-    jr      z, .is_set  ; if a = 1
+    jr      nz, .skip_is_alive      ; if a == 1
+    ld      a, [cell_neighbor_count]
+    cp      2
+    jr      nz, .skip_is_two            ; if a == 2
     ld      d, 1
     jr      .continue
-.is_set
+.skip_is_two                            ; end if
+    cp      3
+    jr      nz, .skip_lives_on          ; if a == 3
+    ld      d, 1
+    jr      .continue
+
+.skip_lives_on                          ; end if
     ld      d, 0
-.continue       ; d is now inverse of current cell
+    jr      .continue
+.skip_is_alive                      ; else is dead
+    ld      a, [cell_neighbor_count]
+    cp      3
+    jr      nz, .skip_reproduce         ; if a == 3
+    ld      d, 1
+    jr      .continue
+.skip_reproduce
+    ld      d, 0
+                                        ; end if
+.continue                           ; end if
+; d has new cell state
 
     call set_cell_buffer_iterator_value
 
