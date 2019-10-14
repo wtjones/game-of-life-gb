@@ -98,17 +98,20 @@ iterate_game::
 .continue                           ; end if
 ; d has new cell state
 
-    call set_cell_buffer_iterator_value
 
-    ld      h, d
-    ld      d, b
-    ld      e, c
+    call    set_cell_buffer_iterator_value
+
+    ld      a, [current_cell_buffer_iterator_value]
+    cp      a, d
+    jr      z, .skip_draw_cell
+
+    ld      h, d    ; param h = color
+    ld      d, b    ; param d = x
+    ld      e, c    ; param e = y
     call    get_pixel_addr
     call    push_command_list
 
-    call    wait_vblank
-    call    apply_command_list
-
+.skip_draw_cell
     call    inc_cell_buffer_iterator
 
     cp      1
