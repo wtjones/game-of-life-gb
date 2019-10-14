@@ -4,9 +4,10 @@ SECTION	"ROM_start",ROM0[$0000]
 
 SECTION	"VBlank_IRQ_Jump",ROM0[$0040]
 ; Vertical Blanking interrupt
-    ld  a,$1
-    ld  [vblank_flag],a
-
+    push    af
+    ld      a,$1
+    ld      [vblank_flag],a
+    pop     af
     reti
 
 SECTION	"LCDC_IRQ_Jump",ROM0[$0048]
