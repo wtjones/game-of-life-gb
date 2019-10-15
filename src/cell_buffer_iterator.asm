@@ -117,7 +117,6 @@ inc_cell_buffer_iterator::
     jp      nz, .did_not_wrap
     inc     hl ; move to next byte of cell buffer
     inc     de
-.did_not_wrap
 
     ld      a, h
     ld      [current_cell_buffer_iterator_high], a
@@ -128,6 +127,7 @@ inc_cell_buffer_iterator::
     ld      a, e
     ld      [successor_cell_buffer_iterator_low], a
 
+.did_not_wrap
     ; get cell state of current x/y
     call    get_cell_value
     ld      [current_cell_buffer_iterator_value], a
