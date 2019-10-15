@@ -59,7 +59,6 @@ inc_neighbor_count_buffer::
     ; reset neighbor count iterator
     call init_neighbor_count_iterator
 
-    ld      hl, neighbor_count_buffer
     ld      a, [current_cell_buffer_iterator_high]
     ld      h, a
     ld      a, [current_cell_buffer_iterator_low]
@@ -136,8 +135,9 @@ inc_neighbor_count::
     inc     hl
     ld      a, d
     add     a, [hl]
-    ld      [cell_neighbor_count], a        ; update the neighbor count
+    ld      d, a
 .skip_count_next_byte                   ; end if
+    ; move count iterator to next byte in the count buffer
     ld      a, h
     ld      [neighbor_count_iterator_high], a
     ld      a, l
@@ -147,10 +147,12 @@ inc_neighbor_count::
     ld      a, [current_cell_buffer_iterator_value]
     cp      1
     jr      nz, .skip_subtract_current  ; if a == 1
-    ld      a, [cell_neighbor_count]
+    ld      a, d
     dec     a
-    ld      [cell_neighbor_count], a        ; update the neighbor count
+    ld      d, a
 .skip_subtract_current                  ; end if
+    ld      a, d
+    ld      [cell_neighbor_count], a
     ret
 
 
