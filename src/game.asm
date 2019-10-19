@@ -18,34 +18,23 @@ init_game::
     ld      [game_iterations], a
     call    get_cell_buffers
 
-    ld      b, 0
-    ld      c, 0
-    INIT_CELL
+    ld      d, 0
+    ld      e, 0
+    call    draw_blinker
 
-    ld      b, 15
-    ld      c, 0
-    INIT_CELL
+    ld      d, 6
+    ld      e, 4
+    call    draw_glider
 
-    ld      b, 1
-    ld      c, 1
-    INIT_CELL
-
-    ld      b, 14
-    ld      c, 1
-    INIT_CELL
-
-    ld      b, 0
-    ld      c, 2
-    INIT_CELL
-
-    ld      b, 15
-    ld      c, 2
-    INIT_CELL
+    ld      d, 0
+    ld      e, 7
+    call    draw_glider
 
     call    wait_vblank
     call    apply_command_list
     xor     a
     ld      [command_list_length], a
+
     ret
 
 
@@ -96,7 +85,7 @@ iterate_game::
     ld      d, 0
                                         ; end if
 .continue                           ; end if
-; d has new cell state
+    ; d has new cell state
 
 
     call    set_cell_buffer_iterator_value
