@@ -94,14 +94,16 @@ get_pixel_addr::
     CALC_ADDR   ; hl = _VRAM + (y * FRAMEBUFFER_WIDTH * 2)
                 ; hl now points to start of row
 
-
     ; tile_ptr =  (tile_y << 8) + (tile_x << 3)
 
-    ld      de, 16
     ld      a, [tile_x]
-    ld      c, a
-    CALC_ADDR   ; hl = hl + (x * 16)
-                ; hl now points to target tile:
+    sla     a
+    sla     a
+    sla     a
+    sla     a
+    ld      d, 0
+    ld      e, a    ; de = x * 16
+    add     hl, de  ; hl now points to target tile:
 
     ; move hl to the local pixel row of the tile
     ld      a, [tile_pixel_offset_y]
