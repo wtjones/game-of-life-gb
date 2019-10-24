@@ -1,5 +1,8 @@
 INCLUDE "debug.inc"
 INCLUDE "game.inc"
+INCLUDE "cell_buffer.inc"
+
+NUM_PATTERNS        EQU 20
 
 SECTION "pattern vars", WRAM0
 
@@ -28,6 +31,43 @@ draw_glider::
     call    draw_pattern
     ret
 
+draw_patterns::
+    ld      c, NUM_PATTERNS / 2
+    inc     c
+    jr      .skip1
+
+.loop1
+    push    bc
+
+    ld      h, CELL_BUFFER_WIDTH - 2
+    ld      l, 0
+    call    get_random_range
+    ld      d, a
+
+    ld      h, CELL_BUFFER_HEIGHT - 2
+    ld      l, 0
+    call    get_random_range
+    ld      e, a
+
+    call    draw_blinker
+
+    ld      h, CELL_BUFFER_WIDTH - 2
+    ld      l, 0
+    call    get_random_range
+    ld      d, a
+
+    ld      h, CELL_BUFFER_HEIGHT - 2
+    ld      l, 0
+    call    get_random_range
+    ld      e, a
+
+    call    draw_glider
+
+    pop     bc
+.skip1
+    dec     c
+    jr      nz, .loop1
+    ret
 
 ; Inputs
 ;   hl = address of pattern

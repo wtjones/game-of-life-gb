@@ -18,9 +18,7 @@ init_game::
     ld      [game_iterations], a
     call    get_cell_buffers
 
-    ld      d, 0
-    ld      e, 0
-    call    draw_blinker
+    call    draw_patterns
 
     ld      d, 6
     ld      e, 4

@@ -43,3 +43,23 @@ fast_random::
 
     ld [seed], a
     ret
+
+; Loops until a valid random value is found
+; Input
+;   H = max
+;   L = min
+; Destroys
+;   BC
+get_random_range::
+.retry
+    call    fast_random
+
+    cp      a, h        ; carry flag if max > rand
+    jr      c, .continue
+
+    cp      a, h
+    jr      nz, .retry
+.continue
+    cp      a, l        ; carry flag if min > rand
+    jr      c, .retry
+    ret
