@@ -1,5 +1,6 @@
 INCLUDE "gbhw.inc"
 INCLUDE "debug.inc"
+INCLUDE "timing.inc"
 
 SECTION	"start",ROM0[$0150]
 
@@ -37,19 +38,25 @@ start::
 
 .main:
     call    init_game
+    DELAY   10
+    DBGMSG "ran init!"
 .main_loop:
 
     ;ld      a, [game_iterations]
     ; cp      a, 0
     ; jr      nz, .iterated
-    call    iterate_game
+    call    iterate_game    ; if returns false, an early-exit has occured
+    cp      1
+    jr      z, .skip_reset_game
+    call    clear_framebuffer
+    DELAY   10
+    call    init_game
+    DELAY   25
+.skip_reset_game
 
 .iterated
-    ;call    swap_cell_buffers
-    ; TODO
     call    wait_vblank
     call    apply_command_list
-
     jr      .main_loop
 
 draw:

@@ -2,6 +2,12 @@
 
 An implementation of [Conway's Game of Life](https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life) for the Game Boy, written in LR35902 (Z80-like) assembler
 
+## Implementation
+
+Uses the standard current/sucessor buffer approach. Each cell = 1 bit.
+
+
+
 ## Building
 
 The Game Boy assembler [RGBDS](https://github.com/rednex/rgbds/) is needed.
