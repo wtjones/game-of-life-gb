@@ -28,7 +28,6 @@ set_pixel::
     ld      [hl], a
     ret
 
-
 ; Resolution of FRAMEBUFFER_WIDTH * FRAMEBUFFER_HEIGHT
 ; Inputs:
 ;   d = x value
@@ -151,6 +150,13 @@ get_pixel_addr::
 ; Destroys:
 ;   everything
 init_framebuffer::
+    call clear_framebuffer
+
+    ld      hl, _SCRN0
+    ld      bc, _SCRN1 - _SCRN0
+    ld      a, $ff
+    call    mem_Set
+
     ld      hl, _SCRN0
     ; skip to center the vertical
     ld      de, (SCRN_Y - FRAMEBUFFER_HEIGHT) * 2
@@ -188,4 +194,11 @@ init_framebuffer_inner_loop
     ld      a,b     ; if b or c != 0,
     or      c
     jr      nz, init_framebuffer_outer_loop
+    ret
+
+clear_framebuffer::
+    ld      hl, _VRAM
+    ld      bc, 384 * 16
+    ld      a, $00
+    call    mem_Set
     ret

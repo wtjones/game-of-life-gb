@@ -12,21 +12,13 @@ SECTION "game code", ROM0
 
 ; Set initial cells and render to framebuffer
 init_game::
-    DBGMSG "init"
+    call    clear_framebuffer
+    call    init_command_list
     call    init_cell_buffer
     xor     a
     ld      [game_iterations], a
-    call    get_cell_buffers
 
     call    draw_patterns
-
-    ld      d, 6
-    ld      e, 4
-    call    draw_glider
-
-    ld      d, 0
-    ld      e, 7
-    call    draw_glider
 
     call    wait_vblank
     call    apply_command_list
@@ -99,6 +91,13 @@ iterate_game::
     call    push_command_list
 
 .skip_draw_cell
+    call    read_joypad
+    ld      a, [joypad_state]
+    cp      0
+    jr      z, .skip_keypress_exit
+    ld      a, 0
+    ret
+.skip_keypress_exit
     call    inc_cell_buffer_iterator
 
     cp      1
@@ -108,5 +107,8 @@ iterate_game::
     inc     a
     ld      [game_iterations], a
     call    swap_cell_buffers
+
+
     DBGMSG "iterate_game end"
+    ld      a, 1
     ret

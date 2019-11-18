@@ -1,5 +1,6 @@
 INCLUDE "gbhw.inc"
 INCLUDE "debug.inc"
+INCLUDE "timing.inc"
 
 SECTION	"start",ROM0[$0150]
 
@@ -36,20 +37,30 @@ start::
     call    test_mode
 
 .main:
+    ;call    init
+
     call    init_game
+
+    DBGMSG "ran init!"
 .main_loop:
 
     ;ld      a, [game_iterations]
     ; cp      a, 0
     ; jr      nz, .iterated
     call    iterate_game
-
+    ; if returned true, an early-exit has occured
 .iterated
     ;call    swap_cell_buffers
     ; TODO
     call    wait_vblank
     call    apply_command_list
-
+    ; call    read_joypad
+    ; ld      a, [joypad_state]
+    ; cp      0
+    ; jr      z, .main_loop
+    ; ; reset game
+    ; call    init_game
+    ; DELAY   25
     jr      .main_loop
 
 draw:

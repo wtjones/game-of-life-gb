@@ -10,15 +10,15 @@ init::
     ld      a, $00
     call    mem_Set
 
-    ld      hl, _VRAM
-    ld      bc, 384 * 16
-    ld      a, $00
-    call    mem_Set
+    ; ld      hl, _VRAM
+    ; ld      bc, 384 * 16
+    ; ld      a, $00
+    ; call    mem_Set
 
-    ld      hl, _SCRN0
-    ld      bc, _SCRN1 - _SCRN0
-    ld      a, $ff
-    call    mem_Set
+    ; ld      hl, _SCRN0
+    ; ld      bc, _SCRN1 - _SCRN0
+    ; ld      a, $ff
+    ; call    mem_Set
 
     call    init_random
     call    init_palette
@@ -27,4 +27,5 @@ init::
     call    init_command_list
     xor     a
     ld      [frame_count], a
+    ld      [joypad_state], a
 ret
