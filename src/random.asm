@@ -48,8 +48,10 @@ fast_random::
 ; Input
 ;   H = max
 ;   L = min
+; Output
+;   A - an 8-bit unsigned integer
 ; Destroys
-;   C
+;   BC
 get_random_range::
 .retry
     call    fast_random

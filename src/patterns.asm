@@ -40,24 +40,24 @@ draw_patterns::
 .loop1
     push    bc
 
-    ld      h, CELL_BUFFER_WIDTH - 2
+    ld      h, CELL_BUFFER_WIDTH - 3
     ld      l, 0
     call    get_random_range
     ld      d, a
 
-    ld      h, CELL_BUFFER_HEIGHT - 2
+    ld      h, CELL_BUFFER_HEIGHT - 3
     ld      l, 0
     call    get_random_range
     ld      e, a
 
     call    draw_blinker
 
-    ld      h, CELL_BUFFER_WIDTH - 2
+    ld      h, CELL_BUFFER_WIDTH - 3
     ld      l, 0
     call    get_random_range
     ld      d, a
 
-    ld      h, CELL_BUFFER_HEIGHT - 2
+    ld      h, CELL_BUFFER_HEIGHT - 3
     ld      l, 0
     call    get_random_range
     ld      e, a
@@ -81,16 +81,17 @@ draw_noise::
     push    de
     push    hl
 
-    ld      h, CELL_BUFFER_WIDTH - 2
+    ld      h, CELL_BUFFER_WIDTH - 1
     ld      l, 0
     call    get_random_range
-    ld      b, a
+    ld      d, a
 
-    ld      h, CELL_BUFFER_HEIGHT - 2
+    ld      h, CELL_BUFFER_HEIGHT - 1
     ld      l, 0
     call    get_random_range
     ld      c, a
 
+    ld      b, d
     ld      h, 1
     INIT_CELL
 
