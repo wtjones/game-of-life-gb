@@ -3,6 +3,7 @@ INCLUDE "game.inc"
 INCLUDE "cell_buffer.inc"
 
 NUM_PATTERNS        EQU 20
+NUM_NOISE_CELLS     EQU 40
 
 SECTION "pattern vars", WRAM0
 
@@ -69,6 +70,38 @@ draw_patterns::
     jr      nz, .loop1
     ret
 
+; Set a pattern of random cells
+draw_noise::
+    ld      c, NUM_NOISE_CELLS
+    inc     c
+    jr      .skip1
+
+.loop1
+    push    bc
+    push    de
+    push    hl
+
+    ld      h, CELL_BUFFER_WIDTH - 2
+    ld      l, 0
+    call    get_random_range
+    ld      b, a
+
+    ld      h, CELL_BUFFER_HEIGHT - 2
+    ld      l, 0
+    call    get_random_range
+    ld      c, a
+
+    ld      h, 1
+    INIT_CELL
+
+    pop     hl
+    pop     de
+    pop     bc
+.skip1
+    dec     c
+    jr      nz, .loop1
+    ret
+
 ; Inputs
 ;   hl = address of pattern
 ;   d = x
@@ -121,6 +154,8 @@ draw_pattern:
     dec     c
     jr      nz, .outer_loop
     ret
+
+
 
 
 SECTION "blinker pattern", ROM0

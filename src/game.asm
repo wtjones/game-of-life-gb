@@ -18,6 +18,7 @@ init_game::
     xor     a
     ld      [game_iterations], a
 
+    call    draw_noise
     call    draw_patterns
 
     call    wait_vblank

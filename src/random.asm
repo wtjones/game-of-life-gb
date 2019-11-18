@@ -49,7 +49,7 @@ fast_random::
 ;   H = max
 ;   L = min
 ; Destroys
-;   BC
+;   C
 get_random_range::
 .retry
     call    fast_random
