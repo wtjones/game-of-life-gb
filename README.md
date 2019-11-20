@@ -2,11 +2,15 @@
 
 An implementation of [Conway's Game of Life](https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life) for the Game Boy, written in LR35902 (Z80-like) assembler
 
+
+<img src="https://user-images.githubusercontent.com/1031558/69206103-654b3a80-0b11-11ea-9aaa-30681de58b0d.gif" width="320" height="288">
+
+
 ## Implementation
 
 Uses the standard current/sucessor buffer approach. Each cell = 1 bit.
 
-
+A faux framebuffer approach is used. A large grid size is possible, but optimizations are needed.
 
 ## Building
 
