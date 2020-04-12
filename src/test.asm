@@ -165,21 +165,22 @@ random_fill:
 .loop
 
     push    bc
-    call    fast_random
-    and     %01111111
-    dec     a
+    ld      h, FRAMEBUFFER_WIDTH
+    ld      l, 0
+    call    get_random_range
     ld      d, a
-    call    fast_random
-    and     %01111111
+    ld      h, FRAMEBUFFER_HEIGHT
+    ld      l, 0
+    call    get_random_range
     ld      e, a
 
     ld      h, %00000010
-    call get_pixel_addr
+    call    get_pixel_addr
     ld      b, d
     ld      c, e
     push    hl
     pop     de
-    call push_command_list
+    call    push_command_list
     pop     bc
 .skip
     dec     c
