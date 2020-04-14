@@ -202,3 +202,14 @@ clear_framebuffer::
     ld      a, $00
     call    mem_SetVRAM
     ret
+
+
+SECTION "framebuffer lookup", ROM0
+
+framebuffer_lookup:
+ROW =  0
+    REPT  FRAMEBUFFER_HEIGHT
+    db    HIGH(_VRAM + (ROW * FRAMEBUFFER_WIDTH * 2))
+    db    LOW(_VRAM + (ROW * FRAMEBUFFER_WIDTH * 2))
+ROW = ROW + 1
+    ENDR
