@@ -10,7 +10,6 @@ SECTION "random", ROM0
 init_random::
     xor a
     ld      a, RANDOM_SEED
-    ld      [seed], a
     ld      [seed1], a
     ld      [seed1 + 1], a
     ld      [seed2], a
