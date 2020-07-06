@@ -85,16 +85,20 @@ get_pixel_addr::
     ld      [tile_pixel_offset_x], a
 
     ; advance address to the target tile
-
-    ld      hl, _VRAM
-    ld      de, FRAMEBUFFER_WIDTH * 2 ; 2 bytes per pixel
+    ld      h, 0
     ld      a, [tile_y]
-    ld      c, a
-    CALC_ADDR   ; hl = _VRAM + (y * FRAMEBUFFER_WIDTH * 2)
-                ; hl now points to start of row
+    ld      l, a
+    add     hl, hl
+    add     hl, hl
+    add     hl, hl
+    add     hl, hl
+    add     hl, hl
+    add     hl, hl  ; hl = y * FRAMEBUFFER_WIDTH * 2 (2 bytes per pixel)
+
+    ld      de, _VRAM
+    add     hl, de  ; hl now points to start of row
 
     ; tile_ptr =  (tile_y << 8) + (tile_x << 3)
-
     ld      a, [tile_x]
     sla     a
     sla     a
@@ -202,3 +206,14 @@ clear_framebuffer::
     ld      a, $00
     call    mem_SetVRAM
     ret
+
+
+SECTION "framebuffer lookup", ROM0
+
+framebuffer_lookup:
+ROW =  0
+    REPT  FRAMEBUFFER_HEIGHT
+    db    HIGH(_VRAM + (ROW * FRAMEBUFFER_WIDTH * 2))
+    db    LOW(_VRAM + (ROW * FRAMEBUFFER_WIDTH * 2))
+ROW = ROW + 1
+    ENDR

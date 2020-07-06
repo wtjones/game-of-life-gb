@@ -76,14 +76,18 @@ get_cell_buffers::
 ; Destroys
 ;   de, hl
 set_cell::
-    call    get_cell_buffers
-
     ; move hl to start of row y
-    ld      de, CELL_BUFFER_WIDTH / 8
-    push    bc
-    CALC_ADDR       ; hl = buffer + (y * CELL_BUFFER_WIDTH / 8)
-                    ; hl now points to start of desired row
-    pop     bc
+    ld      h, 0
+    ld      l, c
+    add     hl, hl
+    add     hl, hl  ; hl = (y * CELL_BUFFER_WIDTH / 8)
+
+    ld      a, [current_cell_buffer_high]
+    ld      d, a
+    ld      a, [current_cell_buffer_low]
+    ld      e, a
+
+    add     hl, de ; hl now points to start of desired row
 
     push    bc
 
