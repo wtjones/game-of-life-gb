@@ -168,7 +168,7 @@ init_framebuffer::
 
     ld      bc, FRAMEBUFFER_HEIGHT / 8
     ld      d, 0      ; tile counter
-init_framebuffer_outer_loop
+init_framebuffer_outer_loop:
     push    de
     ld      de, (SCRN_X - FRAMEBUFFER_WIDTH) / 16
     add     hl, de
@@ -176,7 +176,7 @@ init_framebuffer_outer_loop
     push bc
 
     ld      bc, FRAMEBUFFER_WIDTH / 8
-init_framebuffer_inner_loop
+init_framebuffer_inner_loop:
     ld      a, d
     ld      [hl], a
     inc     a

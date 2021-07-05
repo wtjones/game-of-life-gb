@@ -162,7 +162,7 @@ inc_cell_buffer_iterator::
 ;   hl = address of byte in cell buffer
 ; Outputs
 ;   a = value
-get_cell_value
+get_cell_value:
  ; get cell state of current x/y
     ld      a, [cell_buffer_iterator_mask]
     and     a, [hl]
