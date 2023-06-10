@@ -1,5 +1,5 @@
 IF      !DEF(CELL_BUFFER_ASM)
-CELL_BUFFER_ASM     SET  1
+CELL_BUFFER_ASM = 1
 
 INCLUDE "gbhw.inc"
 INCLUDE "framebuffer.inc"

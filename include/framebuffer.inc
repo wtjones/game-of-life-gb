@@ -1,5 +1,5 @@
 IF      !DEF(FRAMEBUFFER_ASM)
-FRAMEBUFFER_ASM     SET  1
+FRAMEBUFFER_ASM = 1
 
 INCLUDE "gbhw.inc"
 
@@ -18,7 +18,7 @@ FRAMEBUFFER_HEIGHT      EQU 32
 ;   hl = hl + (c * de)
 ; Destroys
 ;   c
-CALC_ADDR: MACRO
+MACRO CALC_ADDR
     inc     c
     jp      .calc_addr_skip\@
 .calc_addr_loop\@:

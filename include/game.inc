@@ -1,5 +1,5 @@
 IF      !DEF(GAME_ASM)
-GAME_ASM     SET  1
+GAME_ASM = 1
 
 INCLUDE "gbhw.inc"
 
@@ -10,7 +10,7 @@ INCLUDE "gbhw.inc"
 ;   h = value
 ; Destroys
 ;   de, hl
-INIT_CELL: MACRO
+MACRO INIT_CELL
 
     ; set_cell doesn't support unset, so make sure we need to set
     ld      a, h
