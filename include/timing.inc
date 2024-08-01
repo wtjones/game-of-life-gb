@@ -1,5 +1,5 @@
 IF      !DEF(TIMING_ASM)
-TIMING_ASM = 1
+DEF TIMING_ASM = 1
 
 ; Delay execution by calling halt \1 times
 ; Example usage:

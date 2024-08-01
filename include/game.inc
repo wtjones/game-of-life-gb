@@ -1,5 +1,5 @@
 IF      !DEF(GAME_ASM)
-GAME_ASM = 1
+DEF GAME_ASM = 1
 
 INCLUDE "gbhw.inc"
 

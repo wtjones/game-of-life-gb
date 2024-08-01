@@ -1,4 +1,4 @@
-RANDOM_SEED            EQU 10
+DEF RANDOM_SEED            EQU 10
 
 SECTION "random vars", WRAM0
 

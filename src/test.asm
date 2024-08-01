@@ -2,7 +2,7 @@ INCLUDE "debug.inc"
 INCLUDE "framebuffer.inc"
 INCLUDE "game.inc"
 
-PIXELS_PER_FRAME        EQU 12
+DEF PIXELS_PER_FRAME        EQU 12
 
 SECTION "test mode vars", WRAM0
 

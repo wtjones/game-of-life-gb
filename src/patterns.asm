@@ -2,8 +2,8 @@ INCLUDE "debug.inc"
 INCLUDE "game.inc"
 INCLUDE "cell_buffer.inc"
 
-NUM_PATTERNS        EQU 4
-NUM_NOISE_CELLS     EQU 255
+DEF NUM_PATTERNS        EQU 4
+DEF NUM_NOISE_CELLS     EQU 255
 
 SECTION "pattern vars", WRAM0
 

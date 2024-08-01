@@ -124,13 +124,12 @@ mem_SetVRAM::
     inc	b
     inc	c
     jr	.skip
-.loop   push    af
-        di
-        lcd_WaitVRAM
-        pop     af
-        ld      [hl+],a
-        ei
-.skip	dec	c
+.loop
+    di
+    ld      [hl+],a
+    ei
+.skip
+    dec	c
     jr	nz,.loop
     dec	b
     jr	nz,.loop
